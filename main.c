@@ -14,7 +14,6 @@
 #include <time.h>
 #include "commands.h"
 #include "registers.h"
-//#include "fifo.h"
 #include "dma.h"
 
 #define PAGE_SIZE      4096UL
