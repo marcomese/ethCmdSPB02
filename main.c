@@ -22,7 +22,7 @@
 #define CONN_MAX_QUEUE 10
 
 #define DATA_ADDR      0x0E000000
-#define FIFO_DATA_LEN  4
+#define FIFO_DATA_LEN  128
 
 pthread_mutex_t mtx; // portare dentro cmdDecodeArgs_t e chkFifoArg_t e dichiararla in main
 
@@ -83,12 +83,10 @@ void* cmdDecodeThread(void *arg){
 void *checkFifoThread(void *arg){
     chkFifoArgs_t* chkArg = (chkFifoArgs_t*)arg;
     uint16_t fifoDataCounter = 0;
-    uint32_t* fifoData;
     uint32_t eventCounter = 0;
     int localSocketStatus;
 
     while (*chkArg->cmdID != EXIT){
-        //fifoDataCounter = fifoGetCounter(chkArg->regs);
         fifoDataCounter = readReg(chkArg->regs->statusReg, STATUS_REG_ADDR, DATA_COUNTER_ADDR);
 
         pthread_mutex_lock(&mtx);
@@ -99,13 +97,12 @@ void *checkFifoThread(void *arg){
             pthread_exit(NULL);
 
         if(fifoDataCounter > 0){
-            //fifoData = fifoGetData(chkArg->regs);
             dma_transfer_s2mm(chkArg->regs->dmaReg, 128);
 
             FILE *outFile = fopen(genFileName(++eventCounter), "a");
 
             for(int i = 0; i < FIFO_DATA_LEN; i++){
-                fprintf(outFile, "%d", *(fifoData+i));
+                fprintf(outFile, "%u", (unsigned int)(*(chkArg->fifoData+i)));
                 if(i != FIFO_DATA_LEN-1)
                     fprintf(outFile, ",");
             }
