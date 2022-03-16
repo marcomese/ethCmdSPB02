@@ -112,7 +112,7 @@ void *checkFifoThread(void *arg){
         }
     }
 
-    pthread_exit((void *)&fifoData);
+    pthread_exit((void *)chkArg->fifoData);
 }
 
 int main(int argc, char *argv[]){
