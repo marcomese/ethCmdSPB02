@@ -161,12 +161,7 @@ int dma_mm2s_sync(unsigned int *virtual_addr)
     // sit in this while loop as long as the status does not read back 0x00001002 (4098)
     // 0x00001002 = IOC interrupt has occured and DMA is idle
     while (!(mm2s_status & IOC_IRQ_FLAG) || !(mm2s_status & IDLE_FLAG))
-    {
-        dma_s2mm_status(virtual_addr);
-        dma_mm2s_status(virtual_addr);
-
         mm2s_status = read_dma(virtual_addr, MM2S_STATUS_REGISTER);
-    }
 
     return 0;
 }
@@ -178,12 +173,7 @@ int dma_s2mm_sync(unsigned int *virtual_addr)
     // sit in this while loop as long as the status does not read back 0x00001002 (4098)
     // 0x00001002 = IOC interrupt has occured and DMA is idle
     while (!(s2mm_status & IOC_IRQ_FLAG) || !(s2mm_status & IDLE_FLAG))
-    {
-        dma_s2mm_status(virtual_addr);
-        dma_mm2s_status(virtual_addr);
-
         s2mm_status = read_dma(virtual_addr, S2MM_STATUS_REGISTER);
-    }
 
     return 0;
 }
@@ -214,18 +204,10 @@ void dma_set_buffer(unsigned int *virtual_addr, unsigned int dest_addr){
 
 void dma_transfer_s2mm(unsigned int *virtual_addr, unsigned int bytes_num)
 {
-    printf("Run the S2MM channel.\n");
     write_dma(virtual_addr, S2MM_CONTROL_REGISTER, RUN_DMA);
-    dma_s2mm_status(virtual_addr);
-
-    printf("Writing S2MM transfer length of 32 bytes...\n");
     write_dma(virtual_addr, S2MM_BUFF_LENGTH_REGISTER, bytes_num);
-    dma_s2mm_status(virtual_addr);
 
-    printf("Waiting for S2MM sychronization...\n");
     dma_s2mm_sync(virtual_addr);
-
-    dma_s2mm_status(virtual_addr);
 
     return;
 }
