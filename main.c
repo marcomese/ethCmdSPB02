@@ -86,7 +86,7 @@ void *checkFifoThread(void *arg){
     uint16_t fifoDataCounter = 0;
     static uint32_t eventCounter = 0;
     uint8_t newFileFlag = 0;
-    char fileName[FILENAME_MAX_LEN] = "";
+    char fileName[FILENAME_LEN] = "";
     int localSocketStatus;
     FILE *outFile;
 
