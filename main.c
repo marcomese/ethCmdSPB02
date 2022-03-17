@@ -24,7 +24,7 @@
 #define DATA_ADDR      0x0E000000
 #define FIFO_DATA_LEN  2 // al momento leggo solo le prime due word che contengono il trg counter ed il gtu counter
 
-#define FILENAME_MAX_LEN 40
+#define FILENAME_LEN 40
 
 pthread_mutex_t mtx; // portare dentro cmdDecodeArgs_t e chkFifoArg_t e dichiararla in main
 
@@ -45,17 +45,16 @@ typedef struct chkFifoArgs{
 
 //    ridefinirla passando per riferimento l'output senza usare static
 
-const char* genFileName(uint32_t eventCounter){
+void genFileName(uint32_t eventCounter, char* fileName, uint32_t fileNameLen){
     time_t rawtime = time(NULL);
     struct tm *ptm = localtime(&rawtime);
-    static char fileName[FILENAME_MAX_LEN] = "";
 
-    snprintf(fileName, FILENAME_MAX_LEN, "/srv/ftp/clkb_event_%04d%02d%02d%02d%02d%02d-%04d.dat",
+    snprintf(fileName, fileNameLen, "/srv/ftp/clkb_event_%04d%02d%02d%02d%02d%02d-%04d.dat",
              ptm->tm_year + 1900, ptm->tm_mon + 1, ptm->tm_mday,
              ptm->tm_hour, ptm->tm_min, ptm->tm_sec,
              eventCounter);
 
-    return fileName;
+    return;
 }
 
 void* cmdDecodeThread(void *arg){
@@ -106,10 +105,10 @@ void *checkFifoThread(void *arg){
 
             newFileFlag = eventCounter % 24;
 
-            if(newFileFlag){
-                fileName = genFileName(eventCounter);
-                outFile = fopen(fileName, "a");
-            }
+            if(newFileFlag)
+                genFileName(eventCounter,fileName,FILENAME_LEN);
+
+            outFile = fopen(fileName, "a");
 
             eventCounter++;
 
