@@ -108,6 +108,8 @@ void *checkFifoThread(void *arg){
             if(newFileFlag)
                 genFileName(eventCounter,fileName,FILENAME_LEN);
 
+            printf("fileName = %s\n",fileName);
+
             outFile = fopen(fileName, "a");
 
             eventCounter++;
