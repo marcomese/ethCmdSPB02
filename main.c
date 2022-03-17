@@ -105,7 +105,7 @@ void *checkFifoThread(void *arg){
 
             newFileFlag = eventCounter % 24;
 
-            if(newFileFlag)
+            if(!newFileFlag)
                 genFileName(eventCounter,fileName,FILENAME_LEN);
 
             printf("fileName = %s\n",fileName);
