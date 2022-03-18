@@ -165,7 +165,7 @@ int main(int argc, char *argv[]){
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     serv_addr.sin_port = htons(CONN_PORT);
 
-    err = -1
+    err = -1;
     while(err < 0)
         err = bind(listenfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
         if(err < 0)
