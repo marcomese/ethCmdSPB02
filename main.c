@@ -97,6 +97,8 @@ void *checkFifoThread(void *arg){
         if(localSocketStatus <= 0)
             pthread_exit(NULL);
 
+        printf("\tDATA COUNTER = %u\n",(unsigned int)fifoDataCounter);
+
         if(fifoDataCounter > 0){
             dma_transfer_s2mm(chkArg->regs->dmaReg, 128);
 
