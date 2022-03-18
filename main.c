@@ -167,7 +167,7 @@ int main(int argc, char *argv[]){
 
     err = -1
     while(err < 0)
-     err = bind(listenfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+        err = bind(listenfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
         if(err < 0)
             printf("\tERR: Error in bind: [%d]\n", err);
 
