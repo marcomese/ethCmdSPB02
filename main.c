@@ -139,6 +139,7 @@ int main(int argc, char *argv[]){
     int socketStatus = 1;
     axiRegisters_t axiRegs;
     uint32_t* fifoData;
+    int err;
 
     int devmem = open("/dev/mem", O_RDWR | O_SYNC);
     if (devmem < 0)
@@ -162,9 +163,14 @@ int main(int argc, char *argv[]){
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     serv_addr.sin_port = htons(CONN_PORT);
 
-    bind(listenfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+    err = bind(listenfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+    if(err < 0)
+        printf("\tERR: Error in bind: [%s]\n", strerror(err));
 
-    listen(listenfd, CONN_MAX_QUEUE);
+
+    err = listen(listenfd, CONN_MAX_QUEUE);
+    if(err < 0)
+        printf("\tERR: Error in listen: [%s]\n", strerror(err));
 
     cmdDecodeArg.regs = &axiRegs;
     cmdDecodeArg.cmdID = &cmdID;
@@ -178,6 +184,8 @@ int main(int argc, char *argv[]){
     while (1)
     {
         connfd = accept(listenfd, (struct sockaddr*)NULL, NULL);
+        if(connfd < 0)
+            printf("\tERR: Error in accept: [%s]\n", strerror(err));
 
         cmdID = NONE;
 
@@ -192,7 +200,7 @@ int main(int argc, char *argv[]){
 
         threadErr = pthread_create(&chkSttID, NULL, &checkFifoThread, (void*)&chkFifoArg);
         if (threadErr != 0)
-            printf("\tERR: Cannot create checkStatus thread: [%s]\n", strerror(threadErr));
+            printf("\tERR: Cannot create checkFifo thread: [%s]\n", strerror(threadErr));
 
         pthread_join(cmdDecID, (void**)&cmdDecRetVal);
         pthread_join(chkSttID, (void**)&chkSttRetVal);
