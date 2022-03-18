@@ -165,14 +165,16 @@ int main(int argc, char *argv[]){
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     serv_addr.sin_port = htons(CONN_PORT);
 
-    err = bind(listenfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
-    if(err < 0)
-        printf("\tERR: Error in bind: [%s]\n", strerror(err));
+    err = -1
+    while(err < 0)
+     err = bind(listenfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+        if(err < 0)
+            printf("\tERR: Error in bind: [%d]\n", err);
 
 
     err = listen(listenfd, CONN_MAX_QUEUE);
     if(err < 0)
-        printf("\tERR: Error in listen: [%s]\n", strerror(err));
+        printf("\tERR: Error in listen: [%d]\n", err);
 
     cmdDecodeArg.regs = &axiRegs;
     cmdDecodeArg.cmdID = &cmdID;
