@@ -21,6 +21,9 @@
 #define CONN_PORT        5000
 #define CONN_MAX_QUEUE   10
 
+#define BIND_MAX_TRIES   10
+#define LISTEN_MAX_TRIES 10
+
 #define DATA_ADDR        0x0E000000
 #define FIFO_DATA_LEN    2 // al momento leggo solo le prime due word che contengono il trg counter ed il gtu counter
 
