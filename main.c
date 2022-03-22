@@ -219,7 +219,7 @@ int main(int argc, char *argv[]){
         }
 
         err = pthread_create(&chkSttID, NULL, &checkFifoThread, (void*)&chkFifoArg);
-        if(err != 0){}
+        if(err != 0){
             printf("\tERR: Cannot create checkFifo thread, disconnecting...: [%s]\n", strerror(err));
             close(connfd);
             continue;
