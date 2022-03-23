@@ -16,8 +16,6 @@
 #include "registers.h"
 #include "dma.h"
 
-#define PAGE_SIZE        4096UL
-
 #define CONN_PORT        5000
 #define CONN_MAX_QUEUE   10
 

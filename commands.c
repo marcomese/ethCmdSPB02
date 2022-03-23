@@ -1,6 +1,4 @@
-#include <stdint.h>
 #include "commands.h"
-#include "registers.h"
 
 #define COUNT(ARRAY) (sizeof(ARRAY) / sizeof(*ARRAY))
 

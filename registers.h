@@ -1,6 +1,11 @@
 #ifndef REGISTERS_H_
 #define REGISTERS_H_
 
+#include <stdint.h>
+#include <sys/mman.h>
+
+#define PAGE_SIZE         4096UL
+
 // Registers base addresses
 #define CTRL_REG_ADDR     0x43C00000
 #define STATUS_REG_ADDR   0x43C10000
