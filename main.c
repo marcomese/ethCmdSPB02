@@ -146,16 +146,35 @@ int main(int argc, char *argv[]){
     int socketStatus = 1;
     int err = -1;
     int tries = 0;
+    void* mmapRet = NULL;
 
     int devmem = open("/dev/mem", O_RDWR | O_SYNC);
     if (devmem < 0)
         printf("Error in opening /dev/mem\n");
 
-    axiRegs.ctrlReg = (uint32_t*)mmap(0, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, devmem, CTRL_REG_ADDR);
-    axiRegs.statusReg = (uint32_t*)mmap(0, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, devmem, STATUS_REG_ADDR);
-    axiRegs.dmaReg = (uint32_t*)mmap(0, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, devmem, DMA_REG_ADDR);
+    mmapRet = mmap(0, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, devmem, CTRL_REG_ADDR);
+    if(mmapRet == MAP_FAILED)
+        printf("Error in mapping CTRL_REG_ADDR\n");
+    
+    axiRegs.ctrlReg = (uint32_t*)mmapRet;
 
-    fifoData = (uint32_t*)mmap(0, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, devmem, DATA_ADDR);
+    mmapRet = mmap(0, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, devmem, STATUS_REG_ADDR);
+    if(mmapRet == MAP_FAILED)
+        printf("Error in mapping STATUS_REG_ADDR\n");
+
+    axiRegs.statusReg = (uint32_t*)mmapRet;
+
+    mmapRet = mmap(0, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, devmem, DMA_REG_ADDR);
+    if(mmapRet == MAP_FAILED)
+        printf("Error in mapping DMA_REG_ADDR\n");
+
+    axiRegs.dmaReg = (uint32_t*)mmapRet;
+
+    mmapRet = mmap(0, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, devmem, DATA_ADDR);
+    if(mmapRet == MAP_FAILED)
+        printf("Error in mapping DATA_ADDR\n");
+
+    fifoData = (uint32_t*)mmapRet;
 
     printf("Initializing DMA...\n");
     dma_init_s2mm(axiRegs.dmaReg);
@@ -180,10 +199,10 @@ int main(int argc, char *argv[]){
     tries = 0;
 
     while(tries < LISTEN_MAX_TRIES){
-    err = listen(listenfd, CONN_MAX_QUEUE);
-    if(err < 0)
-        printf("\tERR: Error in listen function: [%d]\nRetry...\n", err);
-        tries++;
+        err = listen(listenfd, CONN_MAX_QUEUE);
+        if(err < 0)
+            printf("\tERR: Error in listen function: [%d]\nRetry...\n", err);
+            tries++;
     }
 
     cmdDecodeArg.regs = &axiRegs;
