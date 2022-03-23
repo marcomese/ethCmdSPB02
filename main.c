@@ -191,19 +191,21 @@ int main(int argc, char *argv[]){
     while(tries < BIND_MAX_TRIES){
         err = bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
         if(err < 0){
-            printf("\tERR: Error in bind function: [%d]\nRetry...\n", err);
+            printf("\tERR: Error in bind function: [%d]\nRetry %d...\n", err, tries);
             tries++;
         }
     }
+    printf("Bind OK\n");
 
     tries = 0;
 
     while(tries < LISTEN_MAX_TRIES){
         err = listen(listenfd, CONN_MAX_QUEUE);
         if(err < 0)
-            printf("\tERR: Error in listen function: [%d]\nRetry...\n", err);
+            printf("\tERR: Error in listen function: [%d]\nRetry %d...\n", err, tries);
             tries++;
     }
+    printf("Listen OK\n");
 
     cmdDecodeArg.regs = &axiRegs;
     cmdDecodeArg.cmdID = &cmdID;
