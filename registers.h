@@ -32,6 +32,7 @@ void writeReg(uint32_t* devAddr, uint32_t baseAddr, uint32_t regAddr, uint32_t d
 typedef struct axiRegisters{
     uint32_t* ctrlReg;
     uint32_t* statusReg;
+    uint32_t* l1CntReg;
     uint32_t* dmaReg;
 } axiRegisters_t;
 

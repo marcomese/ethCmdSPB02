@@ -162,6 +162,12 @@ int main(int argc, char *argv[]){
 
     axiRegs.statusReg = (uint32_t*)mmapRet;
 
+    mmapRet = mmap(0, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, devmem, L1CNT_REG_ADDR);
+    if(mmapRet == MAP_FAILED)
+        printf("Error in mapping L1CNT_REG_ADDR\n");
+
+    axiRegs.l1CntReg = (uint32_t*)mmapRet;
+
     mmapRet = mmap(0, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, devmem, DMA_REG_ADDR);
     if(mmapRet == MAP_FAILED)
         printf("Error in mapping DMA_REG_ADDR\n");

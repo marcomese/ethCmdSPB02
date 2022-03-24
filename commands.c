@@ -15,8 +15,21 @@ static void writeCmd(axiRegisters_t *regDev, int connfd, cmd_t *c){
 static void readCmd(axiRegisters_t *regDev, int connfd, cmd_t *c){
     uint32_t regVal = 0;
     char resStr[TCP_SND_BUF] = "";
+    uint32_t* reg;
+    
+    switch(c->baseAddr){
+        case STATUS_REG_ADDR:
+            reg = regDev->statusReg;
+            break;
+        case L1CNT_REG_ADDR:
+            reg = regDev->l1CntReg;
+            break;
+        default:
+            reg = regDev->statusReg;
+            break;
+    }
 
-    regVal = readReg(regDev->statusReg, c->baseAddr, c->regAddr);
+    regVal = readReg(reg, c->baseAddr, c->regAddr);
     sprintf(resStr, "%s%u\n", c->feedbackStr, (unsigned int)regVal);
     printf(resStr);
     write(connfd, resStr, strlen(resStr));
