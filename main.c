@@ -100,6 +100,9 @@ void *checkFifoThread(void *arg){
         printf("FIFOCOUNT = %x\n",(unsigned int)fifoDataCounter);
 
         fifoEmptyFlag = fifoDataCounter & FIFO_EMPTY_FLAG;
+
+        printf("FIFOEMPTYFLAG = %x\n",(unsigned int)fifoEmptyFlag);
+
         fifoDataCounter &= 0x1FFF;
 
         pthread_mutex_lock(&mtx);
