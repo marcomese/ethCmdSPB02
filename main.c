@@ -197,10 +197,16 @@ int main(int argc, char *argv[]){
         if(err < 0){
             printf("\tERR: Error in bind function: [%d]\nRetry %d...\n", err, tries);
             tries++;
-        }else
+        }else{
+            printf("Bind OK\n");
             break;
+        }
     }
-    printf("Bind OK\n");
+
+    if(tries >= BIND_MAX_TRIES){
+        printf("Cannot bind to socket, program must be restarted\n");
+        return -1;
+    }
 
     tries = 0;
 
@@ -209,10 +215,16 @@ int main(int argc, char *argv[]){
         if(err < 0){
             printf("\tERR: Error in listen function: [%d]\nRetry %d...\n", err, tries);
             tries++;
-        }else
+        }else{
+            printf("Listen OK\n");
             break;
+        }
     }
-    printf("Listen OK\n");
+
+    if(tries >= LISTEN_MAX_TRIES){
+        printf("Cannot listen to socket, program must be restarted\n");
+        return -1;
+    }
 
     cmdDecodeArg.regs = &axiRegs;
     cmdDecodeArg.cmdID = &cmdID;
