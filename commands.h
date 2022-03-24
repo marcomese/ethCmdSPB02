@@ -46,6 +46,9 @@
 #define READ_STATUS     0x1B
 #define READ_GTUCOUNTER 0x1C
 #define READ_TRGCOUNTER 0x1D
+#define READ_L11COUNTER 0x1E
+#define READ_L12COUNTER 0x1F
+#define READ_L13COUNTER 0x20
 
 #define EXIT            0xFF
 
