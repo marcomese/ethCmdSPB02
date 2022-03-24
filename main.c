@@ -107,6 +107,7 @@ void *checkFifoThread(void *arg){
             pthread_exit(NULL);
 
         if(!fifoEmptyFlag){
+            printf("FIFO not Empty!\n");
             dma_transfer_s2mm(chkArg->regs->dmaReg, 128);
 
             if(!(eventCounter % TRG_NUM_PER_FILE))
@@ -127,7 +128,7 @@ void *checkFifoThread(void *arg){
             fclose(outFile);
         }
     }
-    
+
     printf("checkFifo: EXITING...\n");
     pthread_exit((void *)chkArg->fifoData);
 }
