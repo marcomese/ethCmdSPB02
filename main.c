@@ -96,14 +96,14 @@ void *checkFifoThread(void *arg){
     while (*chkArg->cmdID != EXIT){
         printf("checkFifo: cmdID=%u\n",(unsigned int)*chkArg->cmdID);
         fifoDataCounter = readReg(chkArg->regs->statusReg, STATUS_REG_ADDR, DATA_COUNTER_ADDR);
-
-        printf("FIFOCOUNT = %x\n",(unsigned int)fifoDataCounter);
-
         fifoEmptyFlag = fifoDataCounter & FIFO_EMPTY_FLAG;
-
-        printf("FIFOEMPTYFLAG = %x\n",(unsigned int)fifoEmptyFlag);
-
         fifoDataCounter &= 0x1FFF;
+
+        if(fifoDataCounter > 0)
+            printf("FIFOCOUNT = %x\n",(unsigned int)fifoDataCounter);
+
+        if(fifoEmptyFlag != 0)
+            printf("FIFOEMPTYFLAG = %x\n",(unsigned int)fifoEmptyFlag);
 
         pthread_mutex_lock(&mtx);
         localSocketStatus = *chkArg->socketStatus;
@@ -111,7 +111,7 @@ void *checkFifoThread(void *arg){
 
         if(localSocketStatus <= 0)
             pthread_exit(NULL);
-
+/*
         if(!fifoEmptyFlag){
             printf("FIFO not Empty!\n");
             dma_transfer_s2mm(chkArg->regs->dmaReg, 128);
@@ -133,6 +133,7 @@ void *checkFifoThread(void *arg){
 
             fclose(outFile);
         }
+        */
     }
 
     printf("checkFifo: EXITING...\n");
