@@ -99,17 +99,11 @@ void *checkFifoThread(void *arg){
         if(localSocketStatus <= 0)
             pthread_exit(NULL);
 
-        printf("\rDATA COUNTER = %u",(unsigned int)fifoDataCounter);
-
         if(fifoDataCounter > 0){
             dma_transfer_s2mm(chkArg->regs->dmaReg, 128);
 
-            printf("DATA = %u %u\n",(unsigned int)chkArg->fifoData[0],(unsigned int)chkArg->fifoData[1]);
-
             if(!(eventCounter % TRG_NUM_PER_FILE))
                 genFileName(fileCounter++,fileName,FILENAME_LEN);
-
-            printf("writing in %s\n",fileName);
 
             outFile = fopen(fileName, "a");
 
