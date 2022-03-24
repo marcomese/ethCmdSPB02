@@ -104,6 +104,8 @@ void *checkFifoThread(void *arg){
         if(fifoDataCounter > 0){
             dma_transfer_s2mm(chkArg->regs->dmaReg, 128);
 
+            printf("DATA = %u %u\n",(unsigned int)fifoData[0],(unsigned int)fifoData[1]);
+
             if(!(eventCounter % TRG_NUM_PER_FILE))
                 genFileName(fileCounter++,fileName,FILENAME_LEN);
 
@@ -191,7 +193,8 @@ int main(int argc, char *argv[]){
         if(err < 0){
             printf("\tERR: Error in bind function: [%d]\nRetry %d...\n", err, tries);
             tries++;
-        }
+        }else
+            break;
     }
     printf("Bind OK\n");
 
@@ -199,9 +202,11 @@ int main(int argc, char *argv[]){
 
     while(tries < LISTEN_MAX_TRIES){
         err = listen(listenfd, CONN_MAX_QUEUE);
-        if(err < 0)
+        if(err < 0){
             printf("\tERR: Error in listen function: [%d]\nRetry %d...\n", err, tries);
             tries++;
+        }else
+            break;
     }
     printf("Listen OK\n");
 
