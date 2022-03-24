@@ -79,6 +79,7 @@ void* cmdDecodeThread(void *arg){
             pthread_exit(NULL);
     }
 
+    printf("cmdDecode: EXITING...\n");
     pthread_exit((void *)cmdArg->cmdID);
 }
 
@@ -126,7 +127,8 @@ void *checkFifoThread(void *arg){
             fclose(outFile);
         }
     }
-
+    
+    printf("checkFifo: EXITING...\n");
     pthread_exit((void *)chkArg->fifoData);
 }
 
