@@ -96,7 +96,7 @@ void *checkFifoThread(void *arg){
         fifoEmptyFlag = fifoDataCounter & FIFO_EMPTY_FLAG;
         fifoDataCounter &= 0x1FFF;
 
-        printf("\rFIFOEMPTYFLAG = %x",(unsigned int)fifoEmptyFlag);
+        printf("\rFIFOEMPTYFLAG = %x FIFODATACOUNT = %x",(unsigned int)fifoEmptyFlag,(unsigned int)fifoDataCounter);
 
         pthread_mutex_lock(&mtx);
         localSocketStatus = *chkArg->socketStatus;
