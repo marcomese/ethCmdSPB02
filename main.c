@@ -93,7 +93,7 @@ void *checkFifoThread(void *arg){
     FILE *outFile;
 
     while (*chkArg->cmdID != EXIT){
-        printf("checkFifo: cmdID=%u\n",(unsigned int)*cmdArg->cmdID);
+        printf("checkFifo: cmdID=%u\n",(unsigned int)*chkArg->cmdID);
         fifoDataCounter = readReg(chkArg->regs->statusReg, STATUS_REG_ADDR, DATA_COUNTER_ADDR);
         fifoEmptyFlag = fifoDataCounter & FIFO_EMPTY_FLAG;
         fifoDataCounter &= 0x1FFF;
