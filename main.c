@@ -24,6 +24,7 @@
 
 #define DATA_ADDR        0x0E000000
 #define FIFO_DATA_LEN    2 // al momento leggo solo le prime due word che contengono il trg counter ed il gtu counter
+#define FIFO_EMPTY_FLAG  1U << 13U
 
 #define FILENAME_LEN     50 // 44
 #define TRG_NUM_PER_FILE 25
@@ -83,6 +84,7 @@ void* cmdDecodeThread(void *arg){
 void *checkFifoThread(void *arg){
     chkFifoArgs_t* chkArg = (chkFifoArgs_t*)arg;
     uint16_t fifoDataCounter = 0;
+    uint8_t fifoEmptyFlag = 0;
     static uint32_t eventCounter = 0;
     static uint32_t fileCounter = 0;
     char fileName[FILENAME_LEN] = "";
@@ -91,6 +93,8 @@ void *checkFifoThread(void *arg){
 
     while (*chkArg->cmdID != EXIT){
         fifoDataCounter = readReg(chkArg->regs->statusReg, STATUS_REG_ADDR, DATA_COUNTER_ADDR);
+        fifoEmptyFlag = fifoDataCounter & FIFO_EMPTY_FLAG;
+        fifoDataCounter &= 0x1FFF;
 
         pthread_mutex_lock(&mtx);
         localSocketStatus = *chkArg->socketStatus;
@@ -99,7 +103,7 @@ void *checkFifoThread(void *arg){
         if(localSocketStatus <= 0)
             pthread_exit(NULL);
 
-        if(fifoDataCounter > 0){
+        if(!fifoEmptyFlag){
             dma_transfer_s2mm(chkArg->regs->dmaReg, 128);
 
             if(!(eventCounter % TRG_NUM_PER_FILE))
