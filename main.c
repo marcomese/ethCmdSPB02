@@ -96,9 +96,6 @@ void *checkFifoThread(void *arg){
         fifoEmptyFlag = fifoDataCounter & FIFO_EMPTY_FLAG;
         fifoDataCounter &= 0x1FFF;
 
-        if(fifoDataCounter > 0)
-            printf("FIFOCOUNT = %x\n",(unsigned int)fifoDataCounter);
-
         if(fifoEmptyFlag != 0)
             printf("FIFOEMPTYFLAG = %x\n",(unsigned int)fifoEmptyFlag);
 
