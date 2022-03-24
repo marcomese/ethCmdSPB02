@@ -66,7 +66,6 @@ void* cmdDecodeThread(void *arg){
     write(cmdArg->connfd, welcomeStr, strlen(welcomeStr));
 
     while (*cmdArg->cmdID != EXIT){
-        printf("cmdDecode: cmdID=%u\n",(unsigned int)*cmdArg->cmdID);
         localSocketStatus = read(cmdArg->connfd, ethStr, CMD_MAX_LEN);
 
         pthread_mutex_lock(&mtx);
@@ -79,7 +78,6 @@ void* cmdDecodeThread(void *arg){
             pthread_exit(NULL);
     }
 
-    printf("cmdDecode: EXITING...\n");
     pthread_exit((void *)cmdArg->cmdID);
 }
 
@@ -94,7 +92,6 @@ void *checkFifoThread(void *arg){
     FILE *outFile;
 
     while (*chkArg->cmdID != EXIT){
-        printf("checkFifo: cmdID=%u\n",(unsigned int)*chkArg->cmdID);
         fifoDataCounter = readReg(chkArg->regs->statusReg, STATUS_REG_ADDR, DATA_COUNTER_ADDR);
         fifoEmptyFlag = fifoDataCounter & FIFO_EMPTY_FLAG;
         fifoDataCounter &= 0x1FFF;
@@ -136,7 +133,6 @@ void *checkFifoThread(void *arg){
         */
     }
 
-    printf("checkFifo: EXITING...\n");
     pthread_exit((void *)chkArg->fifoData);
 }
 
