@@ -8,6 +8,7 @@
 #include <termios.h>
 #include <sys/mman.h>
 #include <pthread.h>
+#include <stdint.h>
 
 #define MM2S_CONTROL_REGISTER 0x00
 #define MM2S_STATUS_REGISTER 0x04
