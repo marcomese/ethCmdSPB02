@@ -102,7 +102,7 @@ void *checkFifoThread(void *arg){
         socketKO = *chkArg->socketStatus <= 0;
         pthread_mutex_unlock(&mtx);
 
-        dma_transfer_s2mm(chkArg->regs->dmaReg, 128, exitC);
+        dma_transfer_s2mm(chkArg->regs->dmaReg, 128, &exitC);
 
         if(!isExit(exitC)){
             if(!(eventCounter % TRG_NUM_PER_FILE))
