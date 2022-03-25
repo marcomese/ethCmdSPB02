@@ -22,7 +22,7 @@ int dma_s2mm_sync(unsigned int *virtual_addr, int* socketStatus, uint32_t* cmdID
         pthread_mutex_lock(mtx);
         exitCondition = (*socketStatus <= 0) || (*cmdID == EXIT);
         pthread_mutex_unlock(mtx);
-        printf("\r\texitCondition = %u, cmdID = %u",exitCondition,*cmdID);
+        printf("\r\texitCondition = %u, cmdID = %u, socketStatus = %d",exitCondition,*cmdID,*socketStatus);
     }
 
     printf("EXIT FROM SYNC\n");
