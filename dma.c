@@ -12,13 +12,13 @@ unsigned int read_dma(unsigned int *virtual_addr, int offset)
     return virtual_addr[offset >> 2];
 }
 
-int dma_s2mm_sync(unsigned int *virtual_addr)
+int dma_s2mm_sync(unsigned int *virtual_addr, unsigned int exitCondition)
 {
     unsigned int s2mm_status = read_dma(virtual_addr, S2MM_STATUS_REGISTER);
 
     // sit in this while loop as long as the status does not read back 0x00001002 (4098)
     // 0x00001002 = IOC interrupt has occured and DMA is idle
-    while (!(s2mm_status & IOC_IRQ_FLAG) || !(s2mm_status & IDLE_FLAG))
+    while ((!(s2mm_status & IOC_IRQ_FLAG) || !(s2mm_status & IDLE_FLAG)) && !exitCondition)
         s2mm_status = read_dma(virtual_addr, S2MM_STATUS_REGISTER);
 
     return 0;
@@ -38,12 +38,12 @@ void dma_set_buffer(unsigned int *virtual_addr, unsigned int dest_addr){
     return;
 }
 
-void dma_transfer_s2mm(unsigned int *virtual_addr, unsigned int bytes_num)
+void dma_transfer_s2mm(unsigned int *virtual_addr, unsigned int bytes_num, unsigned int exitCondition)
 {
     write_dma(virtual_addr, S2MM_CONTROL_REGISTER, RUN_DMA);
     write_dma(virtual_addr, S2MM_BUFF_LENGTH_REGISTER, bytes_num);
 
-    dma_s2mm_sync(virtual_addr);
+    dma_s2mm_sync(virtual_addr,exitCondition);
 
     return;
 }

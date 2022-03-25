@@ -44,9 +44,9 @@
 
 unsigned int write_dma(unsigned int *virtual_addr, int offset, unsigned int value);
 unsigned int read_dma(unsigned int *virtual_addr, int offset);
-int dma_s2mm_sync(unsigned int *virtual_addr);
+int dma_s2mm_sync(unsigned int *virtual_addr, unsigned int exitCondition);
 void dma_init_s2mm(unsigned int *virtual_addr);
 void dma_set_buffer(unsigned int *virtual_addr, unsigned int dest_addr);
-void dma_transfer_s2mm(unsigned int *virtual_addr, unsigned int bytes_num);
+void dma_transfer_s2mm(unsigned int *virtual_addr, unsigned int bytes_num, unsigned int exitCondition);
 
 #endif

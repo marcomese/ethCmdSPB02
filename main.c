@@ -83,16 +83,13 @@ void* cmdDecodeThread(void *arg){
 
 void *checkFifoThread(void *arg){
     chkFifoArgs_t* chkArg = (chkFifoArgs_t*)arg;
-    uint16_t fifoDataCounter = 0;
     static uint32_t eventCounter = 0;
     static uint32_t fileCounter = 0;
     char fileName[FILENAME_LEN] = "";
     int localSocketStatus;
     FILE *outFile;
 
-    while (*chkArg->cmdID != EXIT){
-        fifoDataCounter = readReg(chkArg->regs->statusReg, STATUS_REG_ADDR, DATA_COUNTER_ADDR);
-
+    while (1){
         pthread_mutex_lock(&mtx);
         localSocketStatus = *chkArg->socketStatus;
         pthread_mutex_unlock(&mtx);
@@ -100,9 +97,9 @@ void *checkFifoThread(void *arg){
         if(localSocketStatus <= 0)
             pthread_exit(NULL);
 
-        if(fifoDataCounter > 0){
-            dma_transfer_s2mm(chkArg->regs->dmaReg, 128);
+        dma_transfer_s2mm(chkArg->regs->dmaReg, 128, (*chkArg->cmdID == EXIT));
 
+        if(*chkArg->cmdID != EXIT){
             if(!(eventCounter % TRG_NUM_PER_FILE))
                 genFileName(fileCounter++,fileName,FILENAME_LEN);
 
@@ -119,7 +116,8 @@ void *checkFifoThread(void *arg){
             fprintf(outFile,"\n");
 
             fclose(outFile);
-        }
+        }else
+            break;
     }
 
     pthread_exit((void *)chkArg->fifoData);
