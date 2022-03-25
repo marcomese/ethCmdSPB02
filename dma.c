@@ -1,22 +1,19 @@
 #include "dma.h"
 
-unsigned int write_dma(unsigned int *virtual_addr, int offset, unsigned int value)
-{
+unsigned int write_dma(unsigned int *virtual_addr, int offset, unsigned int value){
     virtual_addr[offset >> 2] = value;
 
     return 0;
 }
 
-unsigned int read_dma(unsigned int *virtual_addr, int offset)
-{
+unsigned int read_dma(unsigned int *virtual_addr, int offset){
     return virtual_addr[offset >> 2];
 }
 
-int dma_s2mm_sync(unsigned int *virtual_addr, int* socketStatus, uint32_t* cmdID, pthread_mutex_t* mtx)
-{
+int dma_s2mm_sync(unsigned int *virtual_addr, int* socketStatus, uint32_t* cmdID, pthread_mutex_t* mtx){
     unsigned int s2mm_status = read_dma(virtual_addr, S2MM_STATUS_REGISTER);
     unsigned int exitCondition;
-    
+
     pthread_mutex_lock(mtx);
     exitCondition = (*socketStatus <= 0) || (*cmdID == EXIT);
     pthread_mutex_unlock(mtx);
