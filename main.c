@@ -92,12 +92,12 @@ void *checkFifoThread(void *arg){
     FILE *outFile;
 
     while(!exitCondition){
+        dma_transfer_s2mm(chkArg->regs->dmaReg, 128, chkArg->socketStatus, chkArg->cmdID, &mtx);
+
         pthread_mutex_lock(&mtx);
         socketStatusLocal = *chkArg->socketStatus;
         cmdIDLocal = *chkArg->cmdID;
         pthread_mutex_unlock(&mtx);
-
-        dma_transfer_s2mm(chkArg->regs->dmaReg, 128, chkArg->socketStatus, chkArg->cmdID, &mtx);
 
         exitCondition = (socketStatusLocal <= 0) || (cmdIDLocal == EXIT);
 
