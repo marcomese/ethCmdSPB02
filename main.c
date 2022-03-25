@@ -96,17 +96,14 @@ void *checkFifoThread(void *arg){
         fifoEmptyFlag = fifoDataCounter & FIFO_EMPTY_FLAG;
         fifoDataCounter &= 0x1FFF;
 
-        printf("\rFIFOEMPTYFLAG = %x FIFODATACOUNT = %x",(unsigned int)fifoEmptyFlag,(unsigned int)fifoDataCounter);
-
         pthread_mutex_lock(&mtx);
         localSocketStatus = *chkArg->socketStatus;
         pthread_mutex_unlock(&mtx);
 
         if(localSocketStatus <= 0)
             pthread_exit(NULL);
-/*
-        if(!fifoEmptyFlag){
-            printf("FIFO not Empty!\n");
+
+        if(fifoDataCounter > 0){
             dma_transfer_s2mm(chkArg->regs->dmaReg, 128);
 
             if(!(eventCounter % TRG_NUM_PER_FILE))
@@ -126,7 +123,6 @@ void *checkFifoThread(void *arg){
 
             fclose(outFile);
         }
-        */
     }
 
     pthread_exit((void *)chkArg->fifoData);
