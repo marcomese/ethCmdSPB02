@@ -238,6 +238,7 @@ int main(int argc, char *argv[]){
     while (1)
     {
         cmdID = NONE;
+        socketStatus = 1;
 
         connfd = accept(listenfd, (struct sockaddr*)NULL, NULL);
         if(connfd < 0){
