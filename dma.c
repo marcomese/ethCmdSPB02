@@ -58,7 +58,7 @@ void dma_transfer_s2mm(unsigned int *virtual_addr, unsigned int bytes_num, exitC
     write_dma(virtual_addr, S2MM_CONTROL_REGISTER, RUN_DMA);
     write_dma(virtual_addr, S2MM_BUFF_LENGTH_REGISTER, bytes_num);
 
-    dma_s2mm_sync(virtual_addr,exitVarPtr,exitVal);
+    dma_s2mm_sync(virtual_addr,exitCond);
 
     return;
 }
