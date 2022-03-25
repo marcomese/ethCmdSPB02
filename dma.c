@@ -18,7 +18,7 @@ int dma_s2mm_sync(unsigned int *virtual_addr, int* socketStatus, uint32_t* cmdID
     // 0x00001002 = IOC interrupt has occured and DMA is idle
     while ((!(s2mm_status & IOC_IRQ_FLAG) || !(s2mm_status & IDLE_FLAG)) && !exitCondition){
         s2mm_status = read_dma(virtual_addr, S2MM_STATUS_REGISTER);
-        printf("\r\texitCondition = %u, cmdID = %u\n",exitCondition,*cmdID);
+        printf("\r\texitCondition = %u, cmdID = %u",exitCondition,*cmdID);
         pthread_mutex_lock(mtx);
         exitCondition = (*socketStatus <= 0) || (*cmdID == EXIT);
         pthread_mutex_unlock(mtx);
