@@ -72,7 +72,6 @@ static cmd_t commands[] = {
     {"l11 counter",   READ_L11COUNTER, "L1_1 COUNTER=",     readCmd,  L1CNT_REG_ADDR,  L1_1_COUNTER_ADDR},
     {"l12 counter",   READ_L12COUNTER, "L1_2 COUNTER=",     readCmd,  L1CNT_REG_ADDR,  L1_2_COUNTER_ADDR},
     {"l13 counter",   READ_L13COUNTER, "L1_3 COUNTER=",     readCmd,  L1CNT_REG_ADDR,  L1_3_COUNTER_ADDR},
-    {"fifo counter",  FIFO_COUNTER,    "FIFO COUNTER=",     readCmd,  STATUS_REG_ADDR, DATA_COUNTER_ADDR},
     {"exit",          EXIT,            "EXIT\n",            echo,     NONE,            NONE},
 };
 

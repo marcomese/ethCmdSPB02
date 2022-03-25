@@ -49,7 +49,6 @@
 #define READ_L11COUNTER 0x1E
 #define READ_L12COUNTER 0x1F
 #define READ_L13COUNTER 0x20
-#define FIFO_COUNTER    0x21
 
 #define EXIT            0xFF
 

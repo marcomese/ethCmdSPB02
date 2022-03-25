@@ -103,12 +103,10 @@ void *checkFifoThread(void *arg){
 
         if(!exitCondition){
             if(!(eventCounter % TRG_NUM_PER_FILE)){
-                printf("NEW FILE\n");
                 genFileName(fileCounter++,fileName,FILENAME_LEN);
             }
 
             outFile = fopen(fileName, "a");
-            printf("FILE OPENED\n");
 
             eventCounter++;
 
@@ -117,7 +115,6 @@ void *checkFifoThread(void *arg){
                 if(i != FIFO_DATA_LEN-1)
                     fprintf(outFile, ",");
             }
-            printf("FILE WRITTEN\n");
 
             fprintf(outFile,"\n");
 
