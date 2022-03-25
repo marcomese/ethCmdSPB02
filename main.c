@@ -104,7 +104,7 @@ void *checkFifoThread(void *arg){
 
         dma_transfer_s2mm(chkArg->regs->dmaReg, 128, &exitC);
 
-        if(!isExit(exitC)){
+        if(!isExit(&exitC)){
             if(!(eventCounter % TRG_NUM_PER_FILE))
                 genFileName(fileCounter++,fileName,FILENAME_LEN);
 
