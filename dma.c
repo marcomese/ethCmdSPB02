@@ -6,7 +6,12 @@ unsigned int isExit(exitConditions_t* extC){
     for(int i = 0; i < extC->conditionsNum; i++)
         tmpExtCnd += (*extC->variables[i] == extC->values[i]);
 
-    return (tmpExtCnd == extC->conditionsNum);
+    switch(extC->operation){
+        case OR:
+            return (tmpExtCnd > 0);
+        case AND:
+            return (tmpExtCnd == extC->conditionsNum);
+    }
 }
 
 unsigned int write_dma(unsigned int *virtual_addr, int offset, unsigned int value)

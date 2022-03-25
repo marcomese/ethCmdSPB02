@@ -45,10 +45,13 @@
 #define ENABLE_ALL_IRQ 0x00007000
 
 #define MAX_EXIT_CONDITIONS 5
+#define OR 0
+#define AND 1
 
 typedef struct exitConditions{
     uint8_t conditionsNum;
     pthread_mutex_t* mtx;
+    uint8_t operation;
     uint32_t* variables[MAX_EXIT_CONDITIONS];
     uint32_t values[MAX_EXIT_CONDITIONS];
 } exitConditions_t;

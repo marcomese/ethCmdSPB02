@@ -91,6 +91,7 @@ void *checkFifoThread(void *arg){
     FILE *outFile;
 
     exitC.conditionsNum = 2;
+    exitC.operation = OR;
     exitC.mtx = &mtx;
     exitC.variables[0] = chkArg->cmdID;
     exitC.values[0] = EXIT;
