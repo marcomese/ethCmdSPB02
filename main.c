@@ -83,29 +83,25 @@ void* cmdDecodeThread(void *arg){
 
 void *checkFifoThread(void *arg){
     chkFifoArgs_t* chkArg = (chkFifoArgs_t*)arg;
-    exitConditions_t exitC;
     static uint32_t eventCounter = 0;
     static uint32_t fileCounter = 0;
     char fileName[FILENAME_LEN] = "";
-    unsigned int socketKO = 0;
+    int socketStatusLocal = 0;
+    uint32_t cmdIDLocal = NONE;
+    unsigned int exitCondition = 0;
     FILE *outFile;
-
-    exitC.conditionsNum = 2;
-    exitC.operation = OR;
-    exitC.mtx = &mtx;
-    exitC.variables[0] = chkArg->cmdID;
-    exitC.values[0] = EXIT;
-    exitC.variables[1] = &socketKO;
-    exitC.values[1] = 1;
 
     while(1){
         pthread_mutex_lock(&mtx);
-        socketKO = *chkArg->socketStatus <= 0;
+        socketStatusLocal = *chkArg->socketStatus;
+        cmdIDLocal = *chkArg->cmdID;
         pthread_mutex_unlock(&mtx);
 
-        dma_transfer_s2mm(chkArg->regs->dmaReg, 128, &exitC);
+        dma_transfer_s2mm(chkArg->regs->dmaReg, 128, chkArg->socketStatus, chkArg->cmdID, &mtx);
 
-        if(!isExit(&exitC)){
+        exitCondition = (socketStatusLocal <= 0) || (cmdIDLocal == EXIT);
+
+        if(!exitCondition){
             if(!(eventCounter % TRG_NUM_PER_FILE))
                 genFileName(fileCounter++,fileName,FILENAME_LEN);
 
