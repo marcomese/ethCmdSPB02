@@ -45,19 +45,19 @@
 
 #define MAX_EXIT_CONDITIONS 5
 
-typedef struct exitCondition{
+typedef struct exitConditions{
     uint8_t conditionsNum;
     pthread_mutex_t* mtx;
     uint32_t* variables[MAX_EXIT_CONDITIONS];
     uint32_t values[MAX_EXIT_CONDITIONS];
-} exitCondition_t;
+} exitConditions_t;
 
 unsigned int write_dma(unsigned int *virtual_addr, int offset, unsigned int value);
 unsigned int read_dma(unsigned int *virtual_addr, int offset);
-int dma_s2mm_sync(unsigned int *virtual_addr, exitCondition_t* exitCond);
+int dma_s2mm_sync(unsigned int *virtual_addr, exitConditions_t* exitCond);
 void dma_init_s2mm(unsigned int *virtual_addr);
 void dma_set_buffer(unsigned int *virtual_addr, unsigned int dest_addr);
-void dma_transfer_s2mm(unsigned int *virtual_addr, unsigned int bytes_num, exitCondition_t* exitCond);
+void dma_transfer_s2mm(unsigned int *virtual_addr, unsigned int bytes_num, exitConditions_t* exitCond);
 unsigned int isExit(exitConditions_t* extC);
 
 #endif

@@ -21,7 +21,7 @@ unsigned int read_dma(unsigned int *virtual_addr, int offset)
     return virtual_addr[offset >> 2];
 }
 
-int dma_s2mm_sync(unsigned int *virtual_addr, exitCondition_t* exitCond)
+int dma_s2mm_sync(unsigned int *virtual_addr, exitConditions_t* exitCond)
 {
     unsigned int s2mm_status = read_dma(virtual_addr, S2MM_STATUS_REGISTER);
     unsigned int exitCondition = 0;
@@ -53,7 +53,7 @@ void dma_set_buffer(unsigned int *virtual_addr, unsigned int dest_addr){
     return;
 }
 
-void dma_transfer_s2mm(unsigned int *virtual_addr, unsigned int bytes_num, exitCondition_t* exitCond)
+void dma_transfer_s2mm(unsigned int *virtual_addr, unsigned int bytes_num, exitConditions_t* exitCond)
 {
     write_dma(virtual_addr, S2MM_CONTROL_REGISTER, RUN_DMA);
     write_dma(virtual_addr, S2MM_BUFF_LENGTH_REGISTER, bytes_num);
