@@ -91,7 +91,7 @@ void *checkFifoThread(void *arg){
     unsigned int exitCondition = 0;
     FILE *outFile;
 
-    while(1){
+    while(!exitCondition){
         pthread_mutex_lock(&mtx);
         socketStatusLocal = *chkArg->socketStatus;
         cmdIDLocal = *chkArg->cmdID;
