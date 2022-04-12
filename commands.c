@@ -49,9 +49,9 @@ static void decodeStatusReg(uint32_t statusReg, char* statusStr){
     char tempStr[10] = "";
 
     for(int i = 0; i < 32; i++){
-        tempStr = "";
+        memset(tempStr, '\0', sizeof(tempStr));
         statusBit = (statusReg & (statusMask << i)) >> i;
-        snprintf(tempStr, 10, "%s%d ", statusIDStr[i], statusBit);
+        snprintf(tempStr, sizeof(tempStr), "%s%d ", statusIDStr[i], statusBit);
         strncat(resStr, tempStr, TCP_SND_BUF);
     }
 
