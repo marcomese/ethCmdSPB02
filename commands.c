@@ -42,7 +42,7 @@ const char *statusIDStr[32] = {
     "TRGPDM3="
 }
 
-static void decodeStatus(uint32_t statusReg, char* statusStr){
+static void decodeStatusReg(uint32_t statusReg, char* statusStr){
     uint8_t statusMask = 1;
     uint8_t statusBit = 0;
     char resStr[TCP_SND_BUF] = "";
@@ -75,7 +75,7 @@ static void readCmd(axiRegisters_t *regDev, int connfd, cmd_t *c){
         case STATUS_REG_ADDR:
             reg = regDev->statusReg;
             regVal = readReg(reg, c->baseAddr, c->regAddr);
-            decodeStatus(regVal,resStr);
+            decodeStatusReg(regVal,resStr);
             break;
         case L1CNT_REG_ADDR:
             reg = regDev->l1CntReg;
@@ -122,7 +122,7 @@ static cmd_t commands[] = {
     {"zq1 on",        ZYNQ1_ON,        "ZYNQ1 ON\n",        writeCmd, CTRL_REG_ADDR,   CMD_RECV_ADDR},
     {"zq2 on",        ZYNQ2_ON,        "ZYNQ2 ON\n",        writeCmd, CTRL_REG_ADDR,   CMD_RECV_ADDR},
     {"zq3 on",        ZYNQ3_ON,        "ZYNQ3 ON\n",        writeCmd, CTRL_REG_ADDR,   CMD_RECV_ADDR},
-    {"status",        READ_STATUS,     "STATUS REGISTER=",  readCmd,  STATUS_REG_ADDR, STATUS_REG_ADDR},
+    {"status",        READ_STATUS,     NULL,                readCmd,  STATUS_REG_ADDR, STATUS_REG_ADDR},
     {"gtu counter",   READ_GTUCOUNTER, "GTU COUNTER=",      readCmd,  STATUS_REG_ADDR, GTU_COUNTER_ADDR},
     {"trg counter",   READ_TRGCOUNTER, "TRG COUNTER=",      readCmd,  STATUS_REG_ADDR, TRG_COUNTER_ADDR},
     {"l11 counter",   READ_L11COUNTER, "L1_1 COUNTER=",     readCmd,  L1CNT_REG_ADDR,  L1_1_COUNTER_ADDR},
