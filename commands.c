@@ -83,7 +83,7 @@ static void readCmd(axiRegisters_t *regDev, int connfd, cmd_t *c){
             snprintf(resStr, TCP_SND_BUF, "%s%u\n", c->feedbackStr, (unsigned int)regVal);
             break;
         default:
-            snprintf(resStr, TCP_SND_BUF, invalidAddr);
+            snprintf(resStr, TCP_SND_BUF, "%s" invalidAddr);
             break;
     }
 
