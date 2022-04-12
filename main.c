@@ -120,8 +120,6 @@ void *checkFifoThread(void *arg){
 
             fclose(outFile);
 
-            // release busy after trigger
-            writeReg(chkArg->regs->ctrlReg, CTRL_REG_ADDR, CMD_RECV_ADDR, RELEASE_BUSY);
         }
     }
 

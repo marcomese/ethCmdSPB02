@@ -5,6 +5,60 @@
 static uint8_t sorted = 0;
 
 const char *errStr = "Error invalid command.\n";
+const char *invalidAddr = "Error: invalid register address.\n";
+
+const char *statusIDStr[32] = {
+    "RUN=",
+    "GPS=",
+    "FIFOREADY=",
+    "PPSREADY=",
+    "ZQ1=",
+    "ZQ2=",
+    "ZQ3=",
+    "BUSY=",
+    "BUSY1=",
+    "BUSY2=",
+    "BUSY3=",
+    "BUSYCMD=",
+    "SELFTRGON=",
+    "PPSTRGON=",
+    "MASKTRGON",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "TRGGPS=",
+    "TRGEXT=",
+    "TRGSELF=",
+    "TRGCPU=",
+    "TRGPDM1=",
+    "TRGPDM2=",
+    "TRGPDM3="
+}
+
+static void decodeStatus(uint32_t statusReg, char* statusStr){
+    uint8_t statusMask = 1;
+    uint8_t statusBit = 0;
+    char resStr[TCP_SND_BUF] = "";
+    char tempStr[10] = "";
+
+    for(int i = 0; i < 32; i++){
+        tempStr = "";
+        statusBit = (statusReg & (statusMask << i)) >> i;
+        snprintf(tempStr, 10, "%s%d ", statusIDStr[i], statusBit);
+        strncat(resStr, tempStr, TCP_SND_BUF);
+    }
+
+    strncat(resStr, "\n", TCP_SND_BUF);
+
+    *statusStr = *resStr;
+}
 
 static void writeCmd(axiRegisters_t *regDev, int connfd, cmd_t *c){
     writeReg(regDev->ctrlReg, c->baseAddr, c->regAddr, c->cmdVal);
@@ -20,17 +74,19 @@ static void readCmd(axiRegisters_t *regDev, int connfd, cmd_t *c){
     switch(c->baseAddr){
         case STATUS_REG_ADDR:
             reg = regDev->statusReg;
+            regVal = readReg(reg, c->baseAddr, c->regAddr);
+            decodeStatus(regVal,resStr);
             break;
         case L1CNT_REG_ADDR:
             reg = regDev->l1CntReg;
+            regVal = readReg(reg, c->baseAddr, c->regAddr);
+            snprintf(resStr, TCP_SND_BUF, "%s%u\n", c->feedbackStr, (unsigned int)regVal);
             break;
         default:
-            reg = regDev->statusReg;
+            snprintf(resStr, TCP_SND_BUF, invalidAddr);
             break;
     }
 
-    regVal = readReg(reg, c->baseAddr, c->regAddr);
-    sprintf(resStr, "%s%u\n", c->feedbackStr, (unsigned int)regVal);
     printf(resStr);
     write(connfd, resStr, strlen(resStr));
 }
