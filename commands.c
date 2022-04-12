@@ -62,7 +62,7 @@ static void decodeStatusReg(uint32_t statusReg, char* statusStr){
 
 static void writeCmd(axiRegisters_t *regDev, int connfd, cmd_t *c){
     writeReg(regDev->ctrlReg, c->baseAddr, c->regAddr, c->cmdVal);
-    printf(c->feedbackStr);
+    printf("%s", c->feedbackStr);
     write(connfd, c->feedbackStr, strlen(c->feedbackStr));
 }
 
@@ -87,12 +87,12 @@ static void readCmd(axiRegisters_t *regDev, int connfd, cmd_t *c){
             break;
     }
 
-    printf(resStr);
+    printf("%s", resStr);
     write(connfd, resStr, strlen(resStr));
 }
 
 static void echo(axiRegisters_t *regDev, int connfd, cmd_t *c){
-    printf(c->feedbackStr);
+    printf("%s", c->feedbackStr);
     write(connfd, c->feedbackStr, strlen(c->feedbackStr));
 }
 
@@ -158,7 +158,7 @@ uint32_t decodeCmdStr(axiRegisters_t* regDev, int connfd, char *ethStr){
         cmd->funcPtr(regDev, connfd, cmd);
         return cmd->cmdVal;
     }else{
-        printf(errStr);
+        printf("%s", errStr);
         write(connfd, errStr, strlen(errStr));
     }
 
