@@ -52,10 +52,10 @@ static void decodeStatusReg(uint32_t statusReg, char* statusStr){
         memset(tempStr, '\0', sizeof(tempStr));
         statusBit = (statusReg & (statusMask << i)) >> i;
         snprintf(tempStr, sizeof(tempStr), "%s%d ", statusIDStr[i], statusBit);
-        strncat(resStr, tempStr, TCP_SND_BUF);
+        strncat(resStr, tempStr, sizeof(tempStr));
     }
 
-    strncat(resStr, "\n", TCP_SND_BUF);
+    strncat(resStr, "\n", 1);
 
     *statusStr = *resStr;
 }
@@ -83,7 +83,7 @@ static void readCmd(axiRegisters_t *regDev, int connfd, cmd_t *c){
             snprintf(resStr, TCP_SND_BUF, "%s%u\n", c->feedbackStr, (unsigned int)regVal);
             break;
         default:
-            snprintf(resStr, TCP_SND_BUF, "%s" invalidAddr);
+            snprintf(resStr, TCP_SND_BUF, "%s", invalidAddr);
             break;
     }
 
