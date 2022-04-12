@@ -40,7 +40,7 @@ const char *statusIDStr[32] = {
     "TRGPDM1=",
     "TRGPDM2=",
     "TRGPDM3="
-}
+};
 
 static void decodeStatusReg(uint32_t statusReg, char* statusStr){
     uint8_t statusMask = 1;
