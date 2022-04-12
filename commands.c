@@ -73,21 +73,27 @@ static void readCmd(axiRegisters_t *regDev, int connfd, cmd_t *c){
     char resStr[TCP_SND_BUF] = "";
     uint32_t* reg;
     
-    switch(c->baseAddr){
-        case STATUS_REG_ADDR:
+    switch(c->cmdVal){
+        case READ_STATUS:
             reg = regDev->statusReg;
             regVal = readReg(reg, c->baseAddr, c->regAddr);
             decodeStatusReg(regVal,resStr);
             break;
-        case L1CNT_REG_ADDR:
+        case READ_L11COUNTER:
+        case READ_L12COUNTER:
+        case READ_L13COUNTER:
             reg = regDev->l1CntReg;
             regVal = readReg(reg, c->baseAddr, c->regAddr);
             snprintf(resStr, TCP_SND_BUF, "%s%u\n", c->feedbackStr, (unsigned int)regVal);
             break;
-        default:
+        case READ_TRGCOUNTER:
+        case READ_GTUCOUNTER:
             reg = regDev->statusReg;
             regVal = readReg(reg, c->baseAddr, c->regAddr);
             snprintf(resStr, TCP_SND_BUF, "%s%u\n", c->feedbackStr, (unsigned int)regVal);
+            break;
+        default:
+            snprintf(resStr, TCP_SND_BUF, "%s", invalidAddr);
             break;
     }
 
