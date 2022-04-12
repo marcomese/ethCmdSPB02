@@ -7,7 +7,7 @@ static uint8_t sorted = 0;
 const char *errStr = "Error invalid command.\n";
 const char *invalidAddr = "Error: invalid register address.\n";
 
-const char *statusIDStr[32] = {
+const char statusIDStr[32][STATUS_ID_MAX_LEN] = {
     "RUN=",
     "GPS=",
     "FIFOREADY=",
@@ -22,7 +22,7 @@ const char *statusIDStr[32] = {
     "BUSYCMD=",
     "SELFTRGON=",
     "PPSTRGON=",
-    "MASKTRGON",
+    "MASKTRGON=",
     "",
     "",
     "",
@@ -43,21 +43,23 @@ const char *statusIDStr[32] = {
 };
 
 static void decodeStatusReg(uint32_t statusReg, char* statusStr){
-    uint8_t statusMask = 1;
-    uint8_t statusBit = 0;
+    uint32_t statusMask = 1;
+    uint32_t statusBit = 0;
     char resStr[TCP_SND_BUF] = "";
-    char tempStr[10] = "";
+    char tempStr[STATUS_ID_MAX_LEN] = "";
 
     for(int i = 0; i < 32; i++){
-        memset(tempStr, '\0', sizeof(tempStr));
-        statusBit = (statusReg & (statusMask << i)) >> i;
-        snprintf(tempStr, sizeof(tempStr), "%s%d ", statusIDStr[i], statusBit);
-        strncat(resStr, tempStr, sizeof(tempStr));
+        if(strncmp(statusIDStr[i],"",STATUS_ID_MAX_LEN) != 0){
+            memset(tempStr, '\0', sizeof(tempStr));
+            statusBit = (statusReg & (statusMask << i)) >> i;
+            snprintf(tempStr, sizeof(tempStr), "%s%d ", statusIDStr[i], statusBit);
+            strncat(resStr, tempStr, sizeof(tempStr));
+        }
     }
 
     strncat(resStr, "\n", 1);
 
-    *statusStr = *resStr;
+    strncpy(statusStr,resStr,sizeof(resStr));
 }
 
 static void writeCmd(axiRegisters_t *regDev, int connfd, cmd_t *c){
