@@ -2,7 +2,7 @@
 
 #define COUNT(ARRAY) (sizeof(ARRAY) / sizeof(*ARRAY))
 
-#define RUN_CTRL_POS 11U
+#define RUN_CTRL_POS 15U
 #define RUN_CTRL_MASK (0x0FU << RUN_CTRL_POS)
 
 static uint8_t sorted = 0;
