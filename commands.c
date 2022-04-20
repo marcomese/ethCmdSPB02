@@ -2,6 +2,9 @@
 
 #define COUNT(ARRAY) (sizeof(ARRAY) / sizeof(*ARRAY))
 
+#define RUN_CTRL_POS 11U
+#define RUN_CTRL_MASK (0x0FU << RUN_CTRL_POS)
+
 static uint8_t sorted = 0;
 
 const char *errStr = "Error invalid command.\n";
@@ -42,11 +45,33 @@ const char statusIDStr[32][STATUS_ID_MAX_LEN] = {
     "TRGPDM3="
 };
 
+const char runCtrlDecode[16][STATUS_ID_MAX_LEN] = {
+    "IDLE",
+    "STARTRUN",
+    "WAITTRG",
+    "TRGPPS",
+    "TRGEXT",
+    "TRGCPU",
+    "TRG1",
+    "TRG2",
+    "TRG3",
+    "BUSYCPU",
+    "BUSYZYNQ",
+    "BUSYTRG",
+    "",
+    "",
+    "",
+    "ERR",
+};
+
 static void decodeStatusReg(uint32_t statusReg, char* statusStr){
     uint32_t statusMask = 1;
     uint32_t statusBit = 0;
+    uint8_t runCtrlState = 0;
     char resStr[TCP_SND_BUF] = "";
     char tempStr[STATUS_ID_MAX_LEN] = "";
+
+    runCtrlState = (statusReg & RUN_CTRL_MASK) >> RUN_CTRL_POS;
 
     for(int i = 0; i < 32; i++){
         if(strncmp(statusIDStr[i],"",STATUS_ID_MAX_LEN) != 0){
@@ -57,7 +82,8 @@ static void decodeStatusReg(uint32_t statusReg, char* statusStr){
         }
     }
 
-    strncat(resStr, "\n", 1);
+    snprintf(tempStr, sizeof(tempStr), "RUNCTRL=%s\n", runCtrlDecode[runCtrlState]);
+    strncat(resStr, tempStr, sizeof(tempStr));
 
     strncpy(statusStr,resStr,sizeof(resStr));
 }
