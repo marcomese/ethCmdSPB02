@@ -75,17 +75,18 @@ static void decodeStatusReg(uint32_t statusReg, char* statusStr){
 
     for(int i = 0; i < 32; i++){
         if(strncmp(statusIDStr[i],"",STATUS_ID_MAX_LEN) != 0){
-            memset(tempStr, '\0', sizeof(tempStr));
+            memset(tempStr, '\0', STATUS_ID_MAX_LEN);
             statusBit = (statusReg & (statusMask << i)) >> i;
-            snprintf(tempStr, sizeof(tempStr), "%s%d ", statusIDStr[i], statusBit);
-            strncat(resStr, tempStr, sizeof(tempStr));
+            snprintf(tempStr, STATUS_ID_MAX_LEN, "%s%d ", statusIDStr[i], statusBit);
+            strncat(resStr, tempStr, STATUS_ID_MAX_LEN);
         }
     }
 
-    snprintf(tempStr, sizeof(tempStr), "RUNCTRL=%s\n", runCtrlDecode[runCtrlState]);
-    strncat(resStr, tempStr, sizeof(tempStr));
+    snprintf(tempStr, STATUS_ID_MAX_LEN, "RUNCTRL=%s\n", runCtrlDecode[runCtrlState]);
 
-    strncpy(statusStr,resStr,sizeof(resStr));
+    strncat(resStr, tempStr, STATUS_ID_MAX_LEN);
+
+    strncpy(statusStr,resStr,TCP_SND_BUF);
 }
 
 static void writeCmd(axiRegisters_t *regDev, int connfd, cmd_t *c){

@@ -54,7 +54,7 @@
 
 #define CMD_MAX_LEN     15
 
-#define STATUS_ID_MAX_LEN 15
+#define STATUS_ID_MAX_LEN 128
 
 #define TCP_SND_BUF     2048//1025
 
