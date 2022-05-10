@@ -56,7 +56,7 @@
 
 #define STATUS_ID_MAX_LEN 128
 
-#define TCP_SND_BUF     2048//1025
+#define TCP_SND_BUF     2048
 
 struct cmd;
 typedef void (*funcPtr_t)(axiRegisters_t* regDev, int connfd, struct cmd* cmd);

@@ -65,7 +65,6 @@ const char runCtrlDecode[16][STATUS_ID_MAX_LEN] = {
 };
 
 static void decodeStatusReg(uint32_t statusReg, char* statusStr){
-    uint32_t statusMask = 1;
     uint32_t statusBit = 0;
     uint8_t runCtrlState = 0;
     char resStr[TCP_SND_BUF] = "";
@@ -76,8 +75,11 @@ static void decodeStatusReg(uint32_t statusReg, char* statusStr){
     for(int i = 0; i < 32; i++){
         if(strncmp(statusIDStr[i],"",STATUS_ID_MAX_LEN) != 0){
             memset(tempStr, '\0', STATUS_ID_MAX_LEN);
-            statusBit = (statusReg & (statusMask << i)) >> i;
+            
+            statusBit = (statusReg & (1 << i)) >> i;
+
             snprintf(tempStr, STATUS_ID_MAX_LEN, "%s%d ", statusIDStr[i], statusBit);
+
             strncat(resStr, tempStr, STATUS_ID_MAX_LEN);
         }
     }

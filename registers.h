@@ -15,6 +15,7 @@
 // Registers addresses
 //  CTRL_REG registers
 #define CMD_RECV_ADDR     0x43C00000
+#define FIFO_STATUS_ADDR  0x43C00004
 
 //  STATUS_REG registers
 #define TRG_COUNTER_ADDR  0x43C10004

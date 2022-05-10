@@ -25,6 +25,8 @@
 #define DATA_ADDR        0x0E000000
 #define FIFO_DATA_LEN    2 // al momento leggo solo le prime due word che contengono il trg counter ed il gtu counter
 #define FIFO_EMPTY_FLAG  1U << 13U
+#define LOCK_FIFO        0
+#define RELEASE_FIFO     1
 
 #define FILENAME_LEN     50 // 44
 #define TRG_NUM_PER_FILE 25
@@ -93,7 +95,9 @@ void *checkFifoThread(void *arg){
 
     while(!exitCondition){
         dma_transfer_s2mm(chkArg->regs->dmaReg, 128, chkArg->socketStatus, chkArg->cmdID, &mtx);
-
+        
+        writeReg(hkArg->regs->ctrlReg, CTRL_REG_ADDR, FIFO_STATUS_ADDR, LOCK_FIFO);
+        
         pthread_mutex_lock(&mtx);
         socketStatusLocal = *chkArg->socketStatus;
         cmdIDLocal = *chkArg->cmdID;
@@ -119,6 +123,8 @@ void *checkFifoThread(void *arg){
             fprintf(outFile,"\n");
 
             fclose(outFile);
+
+            writeReg(hkArg->regs->ctrlReg, CTRL_REG_ADDR, FIFO_STATUS_ADDR, RELEASE_FIFO);
 
         }
     }
