@@ -83,7 +83,7 @@ void* cmdDecodeThread(void *arg){
     pthread_exit((void *)cmdArg->cmdID);
 }
 
-void *checkFifoThread(void *arg){
+void* checkFifoThread(void *arg){
     chkFifoArgs_t* chkArg = (chkFifoArgs_t*)arg;
     uint32_t eventCounter = 0;
     uint32_t fileCounter = 0;
@@ -96,7 +96,7 @@ void *checkFifoThread(void *arg){
     while(!exitCondition){
         dma_transfer_s2mm(chkArg->regs->dmaReg, 128, chkArg->socketStatus, chkArg->cmdID, &mtx);
         
-        writeReg(chkArg->regs->ctrlReg, CTRL_REG_ADDR, FIFO_STATUS_ADDR, LOCK_FIFO);
+        //writeReg(chkArg->regs->ctrlReg, CTRL_REG_ADDR, FIFO_STATUS_ADDR, LOCK_FIFO);
         
         pthread_mutex_lock(&mtx);
         socketStatusLocal = *chkArg->socketStatus;
@@ -124,8 +124,7 @@ void *checkFifoThread(void *arg){
 
             fclose(outFile);
 
-            writeReg(chkArg->regs->ctrlReg, CTRL_REG_ADDR, FIFO_STATUS_ADDR, RELEASE_FIFO);
-
+          //  writeReg(chkArg->regs->ctrlReg, CTRL_REG_ADDR, FIFO_STATUS_ADDR, RELEASE_FIFO);
         }
     }
 
