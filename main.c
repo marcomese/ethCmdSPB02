@@ -118,7 +118,7 @@ void* checkFifoThread(void *arg){
 
             for(int i = 0; i < DATA_NUMERICS; i++){
                 fprintf(outFile,"%u,", (unsigned int)(*(chkArg->fifoData+i)));
-                printf("fifoNumerics[%d] = %u\n", i, (unsigned int)(*(chkArg->fifoData+i)));
+                printf("fifoData[%d] = 0x%u\n", i, (unsigned int)(*(chkArg->fifoData+i)));
             }
 
             memset(gpsStr, '\0', DATA_GPS_BYTES);
@@ -130,7 +130,7 @@ void* checkFifoThread(void *arg){
                 gpsStr[(((i-2)*4)+2)] = (char)((*(chkArg->fifoData+i) & 0x00FF0000) >> 16);
                 gpsStr[(((i-2)*4)+3)] = (char)((*(chkArg->fifoData+i) & 0xFF000000) >> 24);
 
-                printf("\tfifoData[%d] = 0x%08x\n", i, (unsigned int)(*(chkArg->fifoData+i)));
+                printf("fifoData[%d] = 0x%08x\n", i, (unsigned int)(*(chkArg->fifoData+i)));
             }
 
             for(int i = DATA_GPS_BYTES-1; i >= 0; i--){
