@@ -27,8 +27,8 @@
 #define DATA_NUMERICS    3
 #define DATA_WORDS       (DATA_BYTES/4)
 #define DATA_GPS_BYTES   (DATA_BYTES-(DATA_NUMERICS*4))
-#define FILENAME_LEN     50
 
+#define UNIXTIME_LEN     15
 #define FILENAME_LEN     50
 #define TRG_NUM_PER_FILE 25
 
