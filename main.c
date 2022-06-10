@@ -140,7 +140,7 @@ void* checkFifoThread(void *arg){
 
             for(int i = DATA_NUMERICS; i < DATA_WORDS; i++){
                 gpsStr[((i-DATA_NUMERICS)*4)]     = (char)(*(chkArg->fifoData+i) & 0x000000FF);
-                gpsStr[(((i-DATA_NUMERICS2)*4)+1)] = (char)((*(chkArg->fifoData+i) & 0x0000FF00) >> 8);
+                gpsStr[(((i-DATA_NUMERICS)*4)+1)] = (char)((*(chkArg->fifoData+i) & 0x0000FF00) >> 8);
                 gpsStr[(((i-DATA_NUMERICS)*4)+2)] = (char)((*(chkArg->fifoData+i) & 0x00FF0000) >> 16);
                 gpsStr[(((i-DATA_NUMERICS)*4)+3)] = (char)((*(chkArg->fifoData+i) & 0xFF000000) >> 24);
             }
