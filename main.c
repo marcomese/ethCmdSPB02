@@ -26,6 +26,7 @@
 #define FIFO_DATA_LEN    3 // al momento leggo solo le prime due word che contengono il trg counter ed il gtu counter + trigger flag (7 bit)
 #define FIFO_EMPTY_FLAG  1U << 13U
 
+#define UNIXTIME_LEN     15
 #define FILENAME_LEN     50
 #define TRG_NUM_PER_FILE 25
 
@@ -44,6 +45,17 @@ typedef struct chkFifoArgs{
     int* socketStatus;
     uint32_t* fifoData;
 } chkFifoArgs_t;
+
+void getUnixTime(char* unixTime){
+    time_t rawtime = time(NULL);
+    struct tm *ptm = localtime(&rawtime);
+
+    snprintf(unixTime, UNIXTIME_LEN, "%04d%02d%02d%02d%02d%02d",
+             ptm->tm_year + 1900, ptm->tm_mon + 1, ptm->tm_mday,
+             ptm->tm_hour, ptm->tm_min, ptm->tm_sec);
+
+    return;
+}
 
 void genFileName(uint32_t fileCounter, char* fileName, uint32_t fileNameLen){
     time_t rawtime = time(NULL);
@@ -86,6 +98,7 @@ void* checkFifoThread(void *arg){
     uint32_t eventCounter = 0;
     uint32_t fileCounter = 0;
     char fileName[FILENAME_LEN] = "";
+    char unixTime[UNIXTIME_LEN] = "";
     int socketStatusLocal = 0;
     uint32_t cmdIDLocal = NONE;
     unsigned int exitCondition = 0;
@@ -109,6 +122,10 @@ void* checkFifoThread(void *arg){
             outFile = fopen(fileName, "a");
 
             eventCounter++;
+
+            getUnixTime(unixTime);
+
+            fprintf(outFile, "%s,", unixTime);
 
             for(int i = 0; i < FIFO_DATA_LEN; i++){
                 fprintf(outFile, "%u", (unsigned int)(*(chkArg->fifoData+i)));
