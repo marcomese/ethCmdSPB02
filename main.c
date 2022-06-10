@@ -196,7 +196,7 @@ int main(int argc, char *argv[]){
 
     axiRegs.dmaReg = (uint32_t*)mmapRet;
 
-    mmapRet = mmap(0, 128*PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, devmem, DATA_ADDR);
+    mmapRet = mmap(0, 128*sizeof(uint32_t), PROT_READ | PROT_WRITE, MAP_SHARED, devmem, DATA_ADDR);
     if(mmapRet == MAP_FAILED)
         printf("Error in mapping DATA_ADDR\n");
 
