@@ -130,7 +130,7 @@ void* checkFifoThread(void *arg){
                 gpsStr[(((i-2)*4)+2)] = (char)((*(chkArg->fifoData+i) & 0x00FF0000) >> 16);
                 gpsStr[(((i-2)*4)+3)] = (char)((*(chkArg->fifoData+i) & 0xFF000000) >> 24);
 
-                printf("\tfifoData[%d] = 0x%08x\n", (unsigned int)(*(chkArg->fifoData+i));
+                printf("\tfifoData[%d] = 0x%08x\n", (unsigned int)(*(chkArg->fifoData+i)));
             }
 
             for(int i = DATA_GPS_BYTES-1; i >= 0; i--){
