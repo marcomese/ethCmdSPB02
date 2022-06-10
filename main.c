@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <errno.h>
-                 #include <string.h>
+#include <string.h>
 #include <sys/types.h>
 #include <fcntl.h>
 #include <sys/mman.h>
@@ -23,8 +23,11 @@
 #define LISTEN_MAX_TRIES 10
 
 #define DATA_ADDR        0x0E000000
-#define FIFO_DATA_LEN    3 // al momento leggo solo le prime due word che contengono il trg counter ed il gtu counter + trigger flag (7 bit)
-#define FIFO_EMPTY_FLAG  1U << 13U
+#define DATA_BYTES       128
+#define DATA_NUMERICS    3
+#define DATA_WORDS       (DATA_BYTES/4)
+#define DATA_GPS_BYTES   (DATA_BYTES-(DATA_NUMERICS*4))
+#define FILENAME_LEN     50
 
 #define FILENAME_LEN     50
 #define TRG_NUM_PER_FILE 25
@@ -90,6 +93,9 @@ void* checkFifoThread(void *arg){
     uint32_t cmdIDLocal = NONE;
     unsigned int exitCondition = 0;
     FILE *outFile;
+    char gpsStr[DATA_GPS_BYTES];
+    char reversedGpsStr[DATA_GPS_BYTES];
+    char *revGpsPtr = reversedGpsStr;
 
     while(!exitCondition){
         dma_transfer_s2mm(chkArg->regs->dmaReg, 128, chkArg->socketStatus, chkArg->cmdID, &mtx);
@@ -110,13 +116,29 @@ void* checkFifoThread(void *arg){
 
             eventCounter++;
 
-            for(int i = 0; i < FIFO_DATA_LEN; i++){
-                fprintf(outFile, "%u", (unsigned int)(*(chkArg->fifoData+i)));
-                if(i != FIFO_DATA_LEN-1)
-                    fprintf(outFile, ",");
+            for(int i = 0; i < DATA_NUMERICS; i++)
+                fprintf(outFile,"%u,",(unsigned int)chkArg->fifoData[i]);
+
+            memset(gpsStr, '\0', DATA_GPS_BYTES);
+            memset(reversedGpsStr, '\0', DATA_GPS_BYTES);
+
+            for(int i = DATA_NUMERICS; i < DATA_WORDS; i++){
+                gpsStr[((i-2)*4)]     = (char)(chkArg->fifoData[i]  & 0x000000FF);
+                gpsStr[(((i-2)*4)+1)] = (char)((chkArg->fifoData[i] & 0x0000FF00) >> 8);
+                gpsStr[(((i-2)*4)+2)] = (char)((chkArg->fifoData[i] & 0x00FF0000) >> 16);
+                gpsStr[(((i-2)*4)+3)] = (char)((chkArg->fifoData[i] & 0xFF000000) >> 24);
+
+                printf("\tfifoData[%d] = 0x%08x\n",chkArg->fifoData[i]);
             }
 
-            fprintf(outFile,"\n");
+            for(int i = DATA_GPS_BYTES-1; i >= 0; i--){
+                if(gpsStr[i] == '\0')
+                    continue;
+                
+                *revGpsPtr++ = gpsStr[i];
+            }
+
+            fprintf(outFile, "%s", reversedGpsStr);
 
             fclose(outFile);
 
