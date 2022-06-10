@@ -22,7 +22,7 @@
 #define BIND_MAX_TRIES   10
 #define LISTEN_MAX_TRIES 10
 
-#define DATA_ADDR        0x0E000000
+#define DATA_ADDR        0x02000000
 #define DATA_BYTES       128
 #define DATA_NUMERICS    3
 #define DATA_WORDS       (DATA_BYTES/4)
