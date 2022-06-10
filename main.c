@@ -126,7 +126,11 @@ void* checkFifoThread(void *arg){
             outFile = fopen(fileName, "a");
 
             eventCounter++;
+            
+            getUnixTime(unixTime);
 
+            fprintf(outFile, "%s,", unixTime);
+            
             for(int i = 0; i < DATA_NUMERICS; i++){
                 fprintf(outFile,"%u,", (unsigned int)(*(chkArg->fifoData+i)));
                 printf("fifoData[%d] = 0x%u\n", i, (unsigned int)(*(chkArg->fifoData+i)));
