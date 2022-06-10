@@ -132,10 +132,8 @@ void* checkFifoThread(void *arg){
 
             fprintf(outFile, "%s,", unixTime);
 
-            for(int i = 0; i < DATA_NUMERICS; i++){
+            for(int i = 0; i < DATA_NUMERICS; i++)
                 fprintf(outFile,"%u,", (unsigned int)(*(chkArg->fifoData+i)));
-                printf("fifoData[%d] = 0x%08x\n", i, (unsigned int)(*(chkArg->fifoData+i)));
-            }
 
             memset(gpsStr, '\0', DATA_GPS_BYTES);
             memset(reversedGpsStr, '\0', DATA_GPS_BYTES);
@@ -145,8 +143,6 @@ void* checkFifoThread(void *arg){
                 gpsStr[(((i-2)*4)+1)] = (char)((*(chkArg->fifoData+i) & 0x0000FF00) >> 8);
                 gpsStr[(((i-2)*4)+2)] = (char)((*(chkArg->fifoData+i) & 0x00FF0000) >> 16);
                 gpsStr[(((i-2)*4)+3)] = (char)((*(chkArg->fifoData+i) & 0xFF000000) >> 24);
-
-                printf("fifoData[%d] = 0x%08x\n", i, (unsigned int)(*(chkArg->fifoData+i)));
             }
 
             for(int i = DATA_GPS_BYTES-1; i >= 0; i--){
@@ -156,7 +152,7 @@ void* checkFifoThread(void *arg){
                 *revGpsPtr++ = gpsStr[i];
             }
 
-            fprintf(outFile, "%s", reversedGpsStr);
+            fprintf(outFile, "%s\n", reversedGpsStr);
 
             fclose(outFile);
 
