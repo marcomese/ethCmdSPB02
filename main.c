@@ -22,7 +22,7 @@
 #define BIND_MAX_TRIES   10
 #define LISTEN_MAX_TRIES 10
 
-#define DATA_ADDR        0x0E000000
+#define DATA_ADDR        0x02000000
 #define FIFO_DATA_LEN    3 // al momento leggo solo le prime due word che contengono il trg counter ed il gtu counter + trigger flag (7 bit)
 #define FIFO_EMPTY_FLAG  1U << 13U
 
