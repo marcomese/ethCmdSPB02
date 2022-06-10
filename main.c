@@ -48,6 +48,17 @@ typedef struct chkFifoArgs{
     uint32_t* fifoData;
 } chkFifoArgs_t;
 
+void getUnixTime(char* unixTime){
+    time_t rawtime = time(NULL);
+    struct tm *ptm = localtime(&rawtime);
+
+    snprintf(unixTime, UNIXTIME_LEN, "%04d%02d%02d%02d%02d%02d",
+             ptm->tm_year + 1900, ptm->tm_mon + 1, ptm->tm_mday,
+             ptm->tm_hour, ptm->tm_min, ptm->tm_sec);
+
+    return;
+}
+
 void genFileName(uint32_t fileCounter, char* fileName, uint32_t fileNameLen){
     time_t rawtime = time(NULL);
     struct tm *ptm = localtime(&rawtime);
