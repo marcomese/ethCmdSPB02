@@ -100,6 +100,7 @@ void* checkFifoThread(void *arg){
     uint32_t eventCounter = 0;
     uint32_t fileCounter = 0;
     char fileName[FILENAME_LEN] = "";
+    char unixTime[UNIXTIME_LEN] = "";
     int socketStatusLocal = 0;
     uint32_t cmdIDLocal = NONE;
     unsigned int exitCondition = 0;
