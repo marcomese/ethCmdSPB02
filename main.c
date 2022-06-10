@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <errno.h>
-#include <string.h>
+                 #include <string.h>
 #include <sys/types.h>
 #include <fcntl.h>
 #include <sys/mman.h>
@@ -25,10 +25,8 @@
 #define DATA_ADDR        0x0E000000
 #define FIFO_DATA_LEN    3 // al momento leggo solo le prime due word che contengono il trg counter ed il gtu counter + trigger flag (7 bit)
 #define FIFO_EMPTY_FLAG  1U << 13U
-#define LOCK_FIFO        0
-#define RELEASE_FIFO     1
 
-#define FILENAME_LEN     50 // 44
+#define FILENAME_LEN     50
 #define TRG_NUM_PER_FILE 25
 
 pthread_mutex_t mtx; // portare dentro cmdDecodeArgs_t e chkFifoArg_t e dichiararla in main
