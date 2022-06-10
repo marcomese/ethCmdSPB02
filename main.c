@@ -130,10 +130,10 @@ void* checkFifoThread(void *arg){
             getUnixTime(unixTime);
 
             fprintf(outFile, "%s,", unixTime);
-            
+
             for(int i = 0; i < DATA_NUMERICS; i++){
                 fprintf(outFile,"%u,", (unsigned int)(*(chkArg->fifoData+i)));
-                printf("fifoData[%d] = 0x%u\n", i, (unsigned int)(*(chkArg->fifoData+i)));
+                printf("fifoData[%d] = 0x%08x\n", i, (unsigned int)(*(chkArg->fifoData+i)));
             }
 
             memset(gpsStr, '\0', DATA_GPS_BYTES);
@@ -211,7 +211,7 @@ int main(int argc, char *argv[]){
 
     axiRegs.dmaReg = (uint32_t*)mmapRet;
 
-    mmapRet = mmap(0, PAGE_SIZE*PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, DATA_ADDR);
+    mmapRet = mmap(0, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, devmem, DATA_ADDR);
     if(mmapRet == MAP_FAILED)
         printf("Error in mapping DATA_ADDR\n");
 
