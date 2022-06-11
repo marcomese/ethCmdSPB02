@@ -110,33 +110,46 @@ void* checkFifoThread(void *arg){
     char *revGpsPtr = reversedGpsStr;
 
     while(!exitCondition){
+        printf("DBG: init dma transfer\n");
         dma_transfer_s2mm(chkArg->regs->dmaReg, 128, chkArg->socketStatus, chkArg->cmdID, &mtx);
 
+        printf("DBG: lock mutex\n");
         pthread_mutex_lock(&mtx);
         socketStatusLocal = *chkArg->socketStatus;
         cmdIDLocal = *chkArg->cmdID;
         pthread_mutex_unlock(&mtx);
+        printf("DBG: unlock mutex\n");
 
         exitCondition = (socketStatusLocal <= 0) || (cmdIDLocal == EXIT);
 
         if(!exitCondition){
             if(!(eventCounter % TRG_NUM_PER_FILE)){
+                printf("DBG: new file\n");
                 genFileName(fileCounter++,fileName,FILENAME_LEN);
+                printf("DBG: filename: %s\n",fileName);
             }
 
+            printf("DBG: open file\n");
             outFile = fopen(fileName, "a");
+            printf("DBG: file opened\n");
 
             eventCounter++;
             
             getUnixTime(unixTime);
+            printf("DBG: unixTime=%s\n",unixTime);
 
             fprintf(outFile, "%s,", unixTime);
+            printf("DBG: unixtime added to file\n");
 
-            for(int i = 0; i < DATA_NUMERICS; i++)
+            for(int i = 0; i < DATA_NUMERICS; i++){
                 fprintf(outFile,"%u,", (unsigned int)(*(chkArg->fifoData+i)));
+                printf("DBG: fifoData[%d]=%d\n",i,(unsigned int)(*(chkArg->fifoData+i)));
+            }
 
+            printf("DBG: memset\n");
             memset(gpsStr, '\0', DATA_GPS_BYTES);
             memset(reversedGpsStr, '\0', DATA_GPS_BYTES);
+            printf("DBG: memset ok\n");
 
             for(int i = DATA_NUMERICS; i < DATA_WORDS; i++){
                 gpsStr[((i-DATA_NUMERICS)*4)]     = (char)(*(chkArg->fifoData+i) & 0x000000FF);
@@ -152,15 +165,23 @@ void* checkFifoThread(void *arg){
             }
 
             for(int i = DATA_GPS_BYTES-1; i >= 0; i--){
-                if(gpsStr[i] == '\0')
+                if(gpsStr[i] == '\0'){
+                    printf("DBG: end of gpsStr\n");
                     continue;
-                
+                }
+                printf("DBG: revGpsStr\n");
                 *revGpsPtr++ = gpsStr[i];
+                printf("DBG: revGpsStr ok\n");
             }
 
-            fprintf(outFile, "%s\n", reversedGpsStr);
 
+            printf("DBG: add newline to file\n");
+            fprintf(outFile, "%s\n", reversedGpsStr);
+            printf("DBG: newline added\n");
+
+            printf("DBG: closing file\n");
             fclose(outFile);
+            printf("DBG: file closed\n");
 
         }
     }
