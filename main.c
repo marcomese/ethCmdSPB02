@@ -28,7 +28,7 @@
 #define DATA_WORDS       (DATA_BYTES/4)
 #define DATA_GPS_BYTES   (DATA_BYTES-(DATA_NUMERICS*4))
 
-#define UNIXTIME_LEN     15
+#define UNIXTIME_LEN     20
 #define FILENAME_LEN     50
 #define TRG_NUM_PER_FILE 25
 
@@ -152,7 +152,7 @@ void* checkFifoThread(void *arg){
             printf("DBG: memset ok\n");
 
             for(int i = DATA_NUMERICS; i < DATA_WORDS; i++){
-                gpsStr[((i-DATA_NUMERICS)*4)]     = (char)(*(chkArg->fifoData+i) & 0x000000FF);
+                gpsStr[((i-DATA_NUMERICS)*4)]     = (char)(*(chkArg->fifoData+i)  & 0x000000FF);
                 gpsStr[(((i-DATA_NUMERICS)*4)+1)] = (char)((*(chkArg->fifoData+i) & 0x0000FF00) >> 8);
                 gpsStr[(((i-DATA_NUMERICS)*4)+2)] = (char)((*(chkArg->fifoData+i) & 0x00FF0000) >> 16);
                 gpsStr[(((i-DATA_NUMERICS)*4)+3)] = (char)((*(chkArg->fifoData+i) & 0xFF000000) >> 24);
