@@ -131,7 +131,10 @@ void* checkFifoThread(void *arg){
 
             printf("DBG: open file\n");
             outFile = fopen(fileName, "a");
-            printf("DBG: file opened\n");
+            if(outFile != NULL)
+                printf("DBG: file opened\n");
+            else
+                printf("DBG: file NOT opened\n");
 
             eventCounter++;
             
