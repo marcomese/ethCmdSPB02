@@ -148,7 +148,7 @@ void* checkFifoThread(void *arg){
                        ((i-DATA_NUMERICS)*4),
                        (((i-DATA_NUMERICS)*4)+1),
                        (((i-DATA_NUMERICS)*4)+2),
-                       (((i-DATA_NUMERICS)*4)+3))
+                       (((i-DATA_NUMERICS)*4)+3));
             }
 
             for(int i = DATA_GPS_BYTES-1; i >= 0; i--){
