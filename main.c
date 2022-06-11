@@ -143,6 +143,12 @@ void* checkFifoThread(void *arg){
                 gpsStr[(((i-DATA_NUMERICS)*4)+1)] = (char)((*(chkArg->fifoData+i) & 0x0000FF00) >> 8);
                 gpsStr[(((i-DATA_NUMERICS)*4)+2)] = (char)((*(chkArg->fifoData+i) & 0x00FF0000) >> 16);
                 gpsStr[(((i-DATA_NUMERICS)*4)+3)] = (char)((*(chkArg->fifoData+i) & 0xFF000000) >> 24);
+
+                printf("i0=%d i1=%d i2=%d i3=%d\n",
+                       ((i-DATA_NUMERICS)*4),
+                       (((i-DATA_NUMERICS)*4)+1),
+                       (((i-DATA_NUMERICS)*4)+2),
+                       (((i-DATA_NUMERICS)*4)+3))
             }
 
             for(int i = DATA_GPS_BYTES-1; i >= 0; i--){
