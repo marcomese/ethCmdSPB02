@@ -2,7 +2,7 @@ CC = gcc
 DEPS = commands.h registers.h dma.h
 OBJ = main.o commands.o registers.o dma.o
 LIBS = -lpthread
-DBG = main.c commands.c registers.c dma.c
+DBG = 0
 
 %.o: %.c $(DEPS)
 	ifeq ($(DBG),1)
@@ -20,3 +20,4 @@ ethCmd: $(OBJ)
 
 clean:
 	rm ./*.o
+(,$(findstring i, $(MAKEFLAGS)))
