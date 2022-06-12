@@ -169,7 +169,7 @@ int main(int argc, char *argv[]){
     int listenfd = 0;
     int connfd = 0;
     struct sockaddr_in serv_addr;
-    uint32_t* fifoData;
+    uint32_t fifoData[DATA_WORDS];
     uint32_t cmdDecRetVal = 0;
     uint32_t chkSttRetVal = 0;
     uint32_t cmdID = NONE;
