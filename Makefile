@@ -7,7 +7,7 @@ LIBS = -lpthread
 	$(CC) -c -o $@ $<
 
 ethCmd: $(OBJ)
-	$(CC) -o $@ $^ $(LIBS)
+	$(CC) -O0 -o $@ $^ $(LIBS)
 
 debug: $(OBJ)
 	$(CC) -O0 -ggdb -o $@ $^ $(LIBS)
