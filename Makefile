@@ -2,7 +2,7 @@ CC = gcc
 DEPS = commands.h registers.h dma.h
 OBJ = main.o commands.o registers.o dma.o
 LIBS = -lpthread
-DBG = 0
+override DBG = 0
 
 %.o: %.c $(DEPS)
 	ifeq ($(DBG),1)
