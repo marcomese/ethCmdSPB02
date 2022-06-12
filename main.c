@@ -185,7 +185,6 @@ void* checkFifoThread(void *arg){
             printf("DBG: closing file\n");
             fclose(outFile);
             printf("DBG: file closed\n");
-
         }
     }
 
