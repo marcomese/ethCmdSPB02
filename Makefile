@@ -10,7 +10,7 @@ ethCmd: $(OBJ)
 	$(CC) -o $@ $^ $(LIBS)
 
 debug: $(OBJ)
-	$(CC) -O0 -g -o $@ $^ $(LIBS)
+	$(CC) -O0 -ggdb -o $@ $^ $(LIBS)
 
 clean:
 	rm ./*.o
