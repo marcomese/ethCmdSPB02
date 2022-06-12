@@ -153,7 +153,9 @@ void* checkFifoThread(void *arg){
                 *revGpsPtr++ = gpsStr[i];
             }
 
-            printf("revGpsStr = %s\n", revGpsStr);
+            revGpsPtr = reversedGpsStr;
+
+            printf("revGpsStr = %s\n", reversedGpsStr);
 
             printf("chkArg->fifoData (addr) = 0x%08x\n", &chkArg->fifoData);
             fprintf(outFile, "%s\n", reversedGpsStr);
