@@ -2,14 +2,15 @@ CC = gcc
 DEPS = commands.h registers.h dma.h
 OBJ = main.o commands.o registers.o dma.o
 LIBS = -lpthread
+DBG = main.c commands.c registers.c dma.c
 
 %.o: %.c $(DEPS)
-	$(CC) -O0 -ggdb -c -o $@ $<
+	$(CC) -c -o $@ $<
 
 ethCmd: $(OBJ)
 	$(CC) -o $@ $^ $(LIBS)
 
-debug: $(OBJ)
+debug: $(DBG)
 	$(CC) -O0 -ggdb -o $@ $^ $(LIBS)
 
 clean:
