@@ -137,6 +137,8 @@ void* checkFifoThread(void *arg){
             memset(gpsStr, '\0', DATA_GPS_BYTES);
             memset(reversedGpsStr, '\0', DATA_GPS_BYTES);
 
+
+
             for(int i = DATA_NUMERICS; i < DATA_WORDS; i++){
                 gpsStr[((i-DATA_NUMERICS)*4)]     = (char)(*(chkArg->fifoData+i)  & 0x000000FF);
                 gpsStr[(((i-DATA_NUMERICS)*4)+1)] = (char)((*(chkArg->fifoData+i) & 0x0000FF00) >> 8);
@@ -151,7 +153,7 @@ void* checkFifoThread(void *arg){
                 *revGpsPtr++ = gpsStr[i];
             }
 
-            printf("reversedGpsStrAddr = 0x%08x\n", &reversedGpsStr);
+            printf("chkArg->fifoData (addr) = 0x%08x\n", &chkArg->fifoData);
             fprintf(outFile, "%s\n", reversedGpsStr);
 
             fclose(outFile);
