@@ -32,7 +32,7 @@
 #define FILENAME_LEN     50
 #define TRG_NUM_PER_FILE 25
 
-pthread_mutex_t mtx; // portare dentro cmdDecodeArgs_t e chkFifoArg_t e dichiararla in main
+pthread_mutex_t mtx;
 
 typedef struct cmdDecodeArgs{
     axiRegisters_t* regs;
