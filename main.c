@@ -151,7 +151,8 @@ void* checkFifoThread(void *arg){
                 *revGpsPtr++ = gpsStr[i];
             }
 
-            fprintf(outFile, "%s\n", reversedGpsStr);
+            if(strncmp(reversedGpsStr,"",DATA_GPS_BYTES) != 0)
+                fprintf(outFile, "%s\n", reversedGpsStr);
 
             fclose(outFile);
         }
