@@ -20,4 +20,3 @@ ethCmd: $(OBJ)
 
 clean:
 	rm ./*.o
-(,$(findstring i, $(MAKEFLAGS)))
