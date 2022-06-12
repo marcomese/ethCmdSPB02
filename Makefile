@@ -9,5 +9,8 @@ LIBS = -lpthread
 ethCmd: $(OBJ)
 	$(CC) -o $@ $^ $(LIBS)
 
+debug: $(OBJ)
+	$(CC) -g -o $@ $^ $(LIBS)
+
 clean:
 	rm ./*.o
