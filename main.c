@@ -105,8 +105,8 @@ void* checkFifoThread(void *arg){
     uint32_t cmdIDLocal = NONE;
     unsigned int exitCondition = 0;
     FILE *outFile;
-    char gpsStr[DATA_GPS_BYTES];
-    char reversedGpsStr[DATA_GPS_BYTES];
+    char gpsStr[DATA_GPS_BYTES] = "";
+    char reversedGpsStr[DATA_GPS_BYTES] = "";
     char *revGpsPtr = reversedGpsStr;
 
     while(!exitCondition){
@@ -137,8 +137,6 @@ void* checkFifoThread(void *arg){
             memset(gpsStr, '\0', DATA_GPS_BYTES);
             memset(reversedGpsStr, '\0', DATA_GPS_BYTES);
 
-
-
             for(int i = DATA_NUMERICS; i < DATA_WORDS; i++){
                 gpsStr[((i-DATA_NUMERICS)*4)]     = (char)(*(chkArg->fifoData+i)  & 0x000000FF);
                 gpsStr[(((i-DATA_NUMERICS)*4)+1)] = (char)((*(chkArg->fifoData+i) & 0x0000FF00) >> 8);
@@ -146,12 +144,16 @@ void* checkFifoThread(void *arg){
                 gpsStr[(((i-DATA_NUMERICS)*4)+3)] = (char)((*(chkArg->fifoData+i) & 0xFF000000) >> 24);
             }
 
+            printf("gpsStr = %s\n", gpsStr);
+
             for(int i = DATA_GPS_BYTES-1; i >= 0; i--){
                 if(gpsStr[i] == '\0')
                     continue;
 
                 *revGpsPtr++ = gpsStr[i];
             }
+
+            printf("revGpsStr = %s\n", revGpsStr);
 
             printf("chkArg->fifoData (addr) = 0x%08x\n", &chkArg->fifoData);
             fprintf(outFile, "%s\n", reversedGpsStr);
