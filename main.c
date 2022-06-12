@@ -30,7 +30,7 @@
 
 #define UNIXTIME_LEN     15
 #define FILENAME_LEN     50
-#define TRG_NUM_PER_FILE 1//25
+#define TRG_NUM_PER_FILE 25
 
 pthread_mutex_t mtx; // portare dentro cmdDecodeArgs_t e chkFifoArg_t e dichiararla in main
 
@@ -154,7 +154,7 @@ void* checkFifoThread(void *arg){
             fprintf(outFile, "%s\n", reversedGpsStr);
 */
             fprintf(outFile, "\n");
-            
+
             fclose(outFile);
         }
     }
