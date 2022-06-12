@@ -2,16 +2,20 @@ CC = gcc
 DEPS = commands.h registers.h dma.h
 OBJ = main.o commands.o registers.o dma.o
 LIBS = -lpthread
-DBG = main.c commands.c registers.c dma.c
 
-%.o: %.c $(DEPS)
-	$(CC) -c -o $@ $<
+ifeq ($(DBG), 1)
+	%.o: %.c $(DEPS)
+		$(CC) -O0 -ggdb -c -o $@ $<
 
-ethCmd: $(OBJ)
-	$(CC) -o $@ $^ $(LIBS)
+	ethCmd: $(OBJ)
+		$(CC) -O0 -ggdb -o $@ $^ $(LIBS)
+else
+	%.o: %.c $(DEPS)
+		$(CC) -c -o $@ $<
 
-debug: $(DBG)
-	$(CC) -O0 -ggdb -o $@ $^ $(LIBS)
+	ethCmd: $(OBJ)
+		$(CC) -o $@ $^ $(LIBS)
+endif
 
 clean:
 	rm ./*.o
