@@ -4,7 +4,7 @@ OBJ = main.o commands.o registers.o dma.o
 LIBS = -lpthread
 
 %.o: %.c $(DEPS)
-	$(CC) -c -o $@ $<
+	$(CC) -O0 -ggdb -c -o $@ $<
 
 ethCmd: $(OBJ)
 	$(CC) -o $@ $^ $(LIBS)
