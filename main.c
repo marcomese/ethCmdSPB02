@@ -22,7 +22,7 @@
 #define BIND_MAX_TRIES   10
 #define LISTEN_MAX_TRIES 10
 
-#define DATA_ADDR        0x0E000000
+#define DATA_ADDR        0x00000000
 #define DATA_BYTES       128
 #define DATA_NUMERICS    3
 #define DATA_WORDS       (DATA_BYTES/4)
@@ -133,7 +133,7 @@ void* checkFifoThread(void *arg){
 
             for(int i = 0; i < DATA_NUMERICS; i++)
                 fprintf(outFile,"%u,", (unsigned int)(*(chkArg->fifoData+i)));
-
+/*
             memset(gpsStr, '\0', DATA_GPS_BYTES);
             memset(reversedGpsStr, '\0', DATA_GPS_BYTES);
 
@@ -152,7 +152,7 @@ void* checkFifoThread(void *arg){
             }
 
             fprintf(outFile, "%s\n", reversedGpsStr);
-
+*/
             fprintf(outFile, "\n");
 
             fclose(outFile);
