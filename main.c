@@ -232,13 +232,13 @@ int main(int argc, char *argv[]){
 
     axiRegs.l1CntReg = (uint32_t*)mmapRet;
 
-    mmapRet = mmap(0, 0xFFFF, PROT_READ | PROT_WRITE, MAP_SHARED, devmem, DMA_REG_ADDR);
+    mmapRet = mmap(0, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, devmem, DMA_REG_ADDR);
     if(mmapRet == MAP_FAILED)
         printf("Error in mapping DMA_REG_ADDR\n");
 
     axiRegs.dmaReg = (uint32_t*)mmapRet;
 
-    mmapRet = mmap(0, 0xFFFF, PROT_READ | PROT_WRITE, MAP_SHARED, devmem, DATA_ADDR);
+    mmapRet = mmap(0, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, devmem, DATA_ADDR);
     if(mmapRet == MAP_FAILED)
         printf("Error in mapping DATA_ADDR\n");
 
