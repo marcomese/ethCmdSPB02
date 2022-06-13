@@ -101,7 +101,7 @@ void* checkFifoThread(void *arg){
     uint32_t fileCounter = 0;
     char fileName[FILENAME_LEN] = "";
     //char unixTime[UNIXTIME_LEN] = "";
-    time_t unixTime = 0;
+    uint32_t unixTime = 0;
     int socketStatusLocal = 0;
     uint32_t cmdIDLocal = NONE;
     unsigned int exitCondition = 0;
@@ -132,7 +132,7 @@ void* checkFifoThread(void *arg){
 
             //fprintf(outFile, "%s,", unixTime);
 
-            unixTime = time(NULL);
+            unixTime = (uint32_t)time(NULL);
 
             fwrite(&unixTime, sizeof(time_t), 1, outFile);
 
