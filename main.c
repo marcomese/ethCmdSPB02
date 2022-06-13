@@ -124,7 +124,7 @@ void* checkFifoThread(void *arg){
             if(!(eventCounter % TRG_NUM_PER_FILE))
                 genFileName(fileCounter++,fileName,FILENAME_LEN);
 
-            outFile = fopen(fileName, "a");
+            outFile = fopen(fileName, "ab");
 
             eventCounter++;
             
