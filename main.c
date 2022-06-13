@@ -23,7 +23,7 @@
 #define LISTEN_MAX_TRIES 10
 
 #define DATA_ADDR        0x00000000
-#define DATA_BYTES       512
+#define DATA_BYTES       128//512
 #define DATA_NUMERICS    3
 #define DATA_WORDS       (DATA_BYTES/4)
 #define DATA_GPS_BYTES   (DATA_BYTES-(DATA_NUMERICS*4))
