@@ -134,7 +134,7 @@ void* checkFifoThread(void *arg){
 
             unixTime = (uint32_t)time(NULL);
 
-            fwrite(&unixTime, sizeof(time_t), 1, outFile);
+            fwrite(&unixTime, sizeof(uint32_t), 1, outFile);
 
             for(int i = 0; i < DATA_NUMERICS; i++)
                 fwrite((chkArg->fifoData+i), sizeof(unsigned int), 1, outFile);
