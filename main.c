@@ -100,7 +100,8 @@ void* checkFifoThread(void *arg){
     uint32_t eventCounter = 0;
     uint32_t fileCounter = 0;
     char fileName[FILENAME_LEN] = "";
-    char unixTime[UNIXTIME_LEN] = "";
+    //char unixTime[UNIXTIME_LEN] = "";
+    time_t unixTime = 0;
     int socketStatusLocal = 0;
     uint32_t cmdIDLocal = NONE;
     unsigned int exitCondition = 0;
@@ -127,12 +128,17 @@ void* checkFifoThread(void *arg){
 
             eventCounter++;
             
-            getUnixTime(unixTime);
+            //getUnixTime(unixTime);
 
-            fprintf(outFile, "%s,", unixTime);
+            //fprintf(outFile, "%s,", unixTime);
+
+            unixTime = time(NULL);
+
+            fwrite(&unixTime, sizeof(time_t), 1, outFile);
 
             for(int i = 0; i < DATA_NUMERICS; i++)
-                fprintf(outFile,"%u,", (unsigned int)(*(chkArg->fifoData+i)));
+                fwrite((chkArg->fifoData+i), sizeof(unsigned int), 1, outFile);
+                //fprintf(outFile,"%u,", (unsigned int)(*(chkArg->fifoData+i)));
 
             memset(gpsStr, '\0', DATA_GPS_BYTES);
             memset(reversedGpsStr, '\0', DATA_GPS_BYTES);
@@ -155,7 +161,8 @@ void* checkFifoThread(void *arg){
 
             revGpsPtr = reversedGpsStr;
 
-            fprintf(outFile, "%s\n", reversedGpsStr);
+            //fprintf(outFile, "%s\n", reversedGpsStr);
+            fwrite(reversedGpsStr, sizeof(char), DATA_GPS_BYTES, outFile);
 
             fclose(outFile);
         }
