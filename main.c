@@ -126,7 +126,6 @@ void* checkFifoThread(void *arg){
             }
 
             memset(gpsStr, '\0', DATA_GPS_BYTES);
-            memset(reversedGpsStr, '\0', DATA_GPS_BYTES);
 
             for(int i = DATA_NUMERICS; i < DATA_WORDS; i++){
                 gpsStr[((i-DATA_NUMERICS)*4)]     = (char)(*(chkArg->fifoData+i)  & 0x000000FF);
