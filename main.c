@@ -12,7 +12,7 @@
 #include <sys/mman.h>
 #include <pthread.h>
 #include <time.h>
-#include <endian-h>
+#include <endian.h>
 #include "commands.h"
 #include "registers.h"
 #include "dma.h"
