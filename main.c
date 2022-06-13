@@ -117,7 +117,6 @@ void* checkFifoThread(void *arg){
             eventCounter++;
             
             unixTime = htobe32((uint32_t)time(NULL));
-
             fwrite(&unixTime, sizeof(uint32_t), 1, outFile);
 
             for(int i = 0; i < DATA_NUMERICS; i++){
