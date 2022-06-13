@@ -145,10 +145,12 @@ void* checkFifoThread(void *arg){
             }
 
             for(int i = DATA_GPS_BYTES-1; i >= 0; i--){
-                if(gpsStr[i] == '\0')
+                if(gpsStr[i] == '\0' || gpsStr[i] == '\n')
                     continue;
-
-                *revGpsPtr++ = gpsStr[i];
+                else if (gpsStr[i] == '\r')
+                    *revGpsPtr++ = ' ';
+                else
+                    *revGpsPtr++ = gpsStr[i];
             }
 
             revGpsPtr = reversedGpsStr;
