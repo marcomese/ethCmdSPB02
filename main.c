@@ -49,17 +49,6 @@ typedef struct chkFifoArgs{
     uint32_t* fifoData;
 } chkFifoArgs_t;
 
-void getUnixTime(char* unixTime){
-    time_t rawtime = time(NULL);
-    struct tm *ptm = localtime(&rawtime);
-
-    snprintf(unixTime, UNIXTIME_LEN, "%04d%02d%02d%02d%02d%02d",
-             ptm->tm_year + 1900, ptm->tm_mon + 1, ptm->tm_mday,
-             ptm->tm_hour, ptm->tm_min, ptm->tm_sec);
-
-    return;
-}
-
 void genFileName(uint32_t fileCounter, char* fileName, uint32_t fileNameLen){
     time_t rawtime = time(NULL);
     struct tm *ptm = localtime(&rawtime);
@@ -101,15 +90,12 @@ void* checkFifoThread(void *arg){
     uint32_t eventCounter = 0;
     uint32_t fileCounter = 0;
     char fileName[FILENAME_LEN] = "";
-    //char unixTime[UNIXTIME_LEN] = "";
     uint32_t unixTime = 0;
     int socketStatusLocal = 0;
     uint32_t cmdIDLocal = NONE;
     unsigned int exitCondition = 0;
     FILE *outFile;
     char gpsStr[DATA_GPS_BYTES] = "";
-    char reversedGpsStr[DATA_GPS_BYTES] = "";
-    char *revGpsPtr = reversedGpsStr;
     uint32_t numericData = 0;
 
     while(!exitCondition){
@@ -130,10 +116,6 @@ void* checkFifoThread(void *arg){
 
             eventCounter++;
             
-            //getUnixTime(unixTime);
-
-            //fprintf(outFile, "%s,", unixTime);
-
             unixTime = htobe32((uint32_t)time(NULL));
 
             fwrite(&unixTime, sizeof(uint32_t), 1, outFile);
@@ -142,7 +124,6 @@ void* checkFifoThread(void *arg){
                 numericData = htobe32(*(chkArg->fifoData+i));
                 fwrite(&numericData, sizeof(uint32_t), 1, outFile);
             }
-                //fprintf(outFile,"%u,", (unsigned int)(*(chkArg->fifoData+i)));
 
             memset(gpsStr, '\0', DATA_GPS_BYTES);
             memset(reversedGpsStr, '\0', DATA_GPS_BYTES);
@@ -154,18 +135,6 @@ void* checkFifoThread(void *arg){
                 gpsStr[(((i-DATA_NUMERICS)*4)+3)] = (char)((*(chkArg->fifoData+i) & 0xFF000000) >> 24);
             }
 
-            for(int i = DATA_GPS_BYTES-1; i >= 0; i--){
-                if(gpsStr[i] == '\0' || gpsStr[i] == '\n')
-                    continue;
-                else if (gpsStr[i] == '\r')
-                    *revGpsPtr++ = ' ';
-                else
-                    *revGpsPtr++ = gpsStr[i];
-            }
-
-            revGpsPtr = reversedGpsStr;
-
-            //fprintf(outFile, "%s\n", reversedGpsStr);
             fwrite(gpsStr, sizeof(char), DATA_GPS_BYTES, outFile);
 
             fclose(outFile);
