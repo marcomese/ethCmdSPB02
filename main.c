@@ -12,6 +12,7 @@
 #include <sys/mman.h>
 #include <pthread.h>
 #include <time.h>
+#include <endian-h>
 #include "commands.h"
 #include "registers.h"
 #include "dma.h"
@@ -109,6 +110,7 @@ void* checkFifoThread(void *arg){
     char gpsStr[DATA_GPS_BYTES] = "";
     char reversedGpsStr[DATA_GPS_BYTES] = "";
     char *revGpsPtr = reversedGpsStr;
+    uint32_t numericData = 0;
 
     while(!exitCondition){
         dma_transfer_s2mm(chkArg->regs->dmaReg, 128, chkArg->socketStatus, chkArg->cmdID, &mtx);
@@ -132,12 +134,14 @@ void* checkFifoThread(void *arg){
 
             //fprintf(outFile, "%s,", unixTime);
 
-            unixTime = (uint32_t)time(NULL);
+            unixTime = htobe32((uint32_t)time(NULL));
 
             fwrite(&unixTime, sizeof(uint32_t), 1, outFile);
 
-            for(int i = 0; i < DATA_NUMERICS; i++)
-                fwrite((chkArg->fifoData+i), sizeof(unsigned int), 1, outFile);
+            for(int i = 0; i < DATA_NUMERICS; i++){
+                numericData = htobe32(*(chkArg->fifoData+i));
+                fwrite(&numericData, sizeof(uint32_t), 1, outFile);
+            }
                 //fprintf(outFile,"%u,", (unsigned int)(*(chkArg->fifoData+i)));
 
             memset(gpsStr, '\0', DATA_GPS_BYTES);
@@ -162,7 +166,7 @@ void* checkFifoThread(void *arg){
             revGpsPtr = reversedGpsStr;
 
             //fprintf(outFile, "%s\n", reversedGpsStr);
-            fwrite(reversedGpsStr, sizeof(char), DATA_GPS_BYTES, outFile);
+            fwrite(gpsStr, sizeof(char), DATA_GPS_BYTES, outFile);
 
             fclose(outFile);
         }
