@@ -24,7 +24,7 @@
 #define LISTEN_MAX_TRIES 10
 
 #define DATA_ADDR        0x00000000
-#define DATA_BYTES       128//512
+#define DATA_BYTES       512
 #define DATA_NUMERICS    3
 #define DATA_WORDS       (DATA_BYTES/4)
 #define DATA_GPS_BYTES   (DATA_BYTES-(DATA_NUMERICS*4))
@@ -99,7 +99,7 @@ void* checkFifoThread(void *arg){
     uint32_t numericData = 0;
 
     while(!exitCondition){
-        dma_transfer_s2mm(chkArg->regs->dmaReg, 128, chkArg->socketStatus, chkArg->cmdID, &mtx);
+        dma_transfer_s2mm(chkArg->regs->dmaReg, DATA_BYTES, chkArg->socketStatus, chkArg->cmdID, &mtx);
 
         pthread_mutex_lock(&mtx);
         socketStatusLocal = *chkArg->socketStatus;
