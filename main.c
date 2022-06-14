@@ -49,6 +49,14 @@ typedef struct chkFifoArgs{
     uint32_t* fifoData;
 } chkFifoArgs_t;
 
+typedef struct spb2Data{
+    uint32_t unixTime;
+    uint32_t trgCount;
+    uint32_t gtuCount;
+    uint32_t trgFlag;
+    char     gpsStr[DATA_GPS_BYTES];
+} spb2Data_t;
+
 void genFileName(uint32_t fileCounter, char* fileName, uint32_t fileNameLen){
     time_t rawtime = time(NULL);
     struct tm *ptm = localtime(&rawtime);
@@ -95,8 +103,9 @@ void* checkFifoThread(void *arg){
     uint32_t cmdIDLocal = NONE;
     unsigned int exitCondition = 0;
     FILE *outFile;
-    char gpsStr[DATA_GPS_BYTES] = "";
-    uint32_t numericData = 0;
+    //char gpsStr[DATA_GPS_BYTES] = "";
+    uint32_t numericData[DATA_NUMERICS];
+    spb2Data_t data = {0, 0, 0, ""};
 
     while(!exitCondition){
         dma_transfer_s2mm(chkArg->regs->dmaReg, DATA_BYTES, chkArg->socketStatus, chkArg->cmdID, &mtx);
@@ -108,6 +117,9 @@ void* checkFifoThread(void *arg){
 
         exitCondition = (socketStatusLocal <= 0) || (cmdIDLocal == EXIT);
 
+        memset(gpsStr, '\0', DATA_GPS_BYTES);
+        memset(numericData, 0, DATA_NUMERICS);
+
         if(!exitCondition){
             if(!(eventCounter % TRG_NUM_PER_FILE))
                 genFileName(fileCounter++,fileName,FILENAME_LEN);
@@ -117,23 +129,28 @@ void* checkFifoThread(void *arg){
             eventCounter++;
             
             unixTime = htobe32((uint32_t)time(NULL));
-            fwrite(&unixTime, sizeof(uint32_t), 1, outFile);
+            //fwrite(&unixTime, sizeof(uint32_t), 1, outFile);
+            data.unixTime = unixTime;
 
-            for(int i = 0; i < DATA_NUMERICS; i++){
-                numericData = htobe32(*(chkArg->fifoData+i));
-                fwrite(&numericData, sizeof(uint32_t), 1, outFile);
-            }
+            for(int i = 0; i < DATA_NUMERICS; i++)//{
+                numericData[i] = htobe32(*(chkArg->fifoData+i));
+                //fwrite(&numericData, sizeof(uint32_t), 1, outFile);
+            //}
 
-            memset(gpsStr, '\0', DATA_GPS_BYTES);
+            data.trgCount = numericData[TRGCNT_IDX];
+            data.gtuCount = numericData[GTUCNT_IDX];
+            data.trgFlag =  numericData[TRGFLG_IDX];
 
             for(int i = DATA_NUMERICS; i < DATA_WORDS; i++){
-                gpsStr[((i-DATA_NUMERICS)*4)]     = (char)(*(chkArg->fifoData+i)  & 0x000000FF);
-                gpsStr[(((i-DATA_NUMERICS)*4)+1)] = (char)((*(chkArg->fifoData+i) & 0x0000FF00) >> 8);
-                gpsStr[(((i-DATA_NUMERICS)*4)+2)] = (char)((*(chkArg->fifoData+i) & 0x00FF0000) >> 16);
-                gpsStr[(((i-DATA_NUMERICS)*4)+3)] = (char)((*(chkArg->fifoData+i) & 0xFF000000) >> 24);
+                data.gpsStr[((i-DATA_NUMERICS)*4)]     = (char)(*(chkArg->fifoData+i)  & 0x000000FF);
+                data.gpsStr[(((i-DATA_NUMERICS)*4)+1)] = (char)((*(chkArg->fifoData+i) & 0x0000FF00) >> 8);
+                data.gpsStr[(((i-DATA_NUMERICS)*4)+2)] = (char)((*(chkArg->fifoData+i) & 0x00FF0000) >> 16);
+                data.gpsStr[(((i-DATA_NUMERICS)*4)+3)] = (char)((*(chkArg->fifoData+i) & 0xFF000000) >> 24);
             }
 
-            fwrite(gpsStr, sizeof(char), DATA_GPS_BYTES, outFile);
+            //fwrite(gpsStr, sizeof(char), DATA_GPS_BYTES, outFile);
+
+            fwrite(&data, sizeof(data), 1, outFile);
 
             fclose(outFile);
         }
