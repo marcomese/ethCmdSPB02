@@ -105,8 +105,6 @@ void* checkFifoThread(void *arg){
     uint32_t cmdIDLocal = NONE;
     uint32_t eventCounter = 0;
     uint32_t fileCounter = 0;
-    uint32_t unixTime = 0;
-    uint32_t numericData[DATA_NUMERICS];
     char fileName[FILENAME_LEN] = "";
     spb2Data_t data = {0, 0, 0, 0, ""};
 
@@ -130,16 +128,11 @@ void* checkFifoThread(void *arg){
             outFile = fopen(fileName, "ab");
 
             eventCounter++;
-            
-            unixTime = htobe32((uint32_t)time(NULL));
-            data.unixTime = unixTime;
 
-            for(int i = 0; i < DATA_NUMERICS; i++)
-                numericData[i] = htobe32(*(chkArg->fifoData+i));
-
-            data.trgCount = numericData[TRGCNT_IDX];
-            data.gtuCount = numericData[GTUCNT_IDX];
-            data.trgFlag  = numericData[TRGFLG_IDX];
+            data.unixTime = htobe32((uint32_t)time(NULL));
+            data.trgCount = htobe32(*(chkArg->fifoData+TRGCNT_IDX));
+            data.gtuCount = htobe32(*(chkArg->fifoData+GTUCNT_IDX));
+            data.trgFlag  = htobe32(*(chkArg->fifoData+TRGFLG_IDX));
 
             for(int i = DATA_NUMERICS; i < DATA_WORDS; i++){
                 data.gpsStr[((i-DATA_NUMERICS)*4)]     = (char)(*(chkArg->fifoData+i)  & 0x000000FF);
