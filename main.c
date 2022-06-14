@@ -121,12 +121,10 @@ void* checkFifoThread(void *arg){
         memset(data.gpsStr, '\0', DATA_GPS_BYTES);
 
         if(!exitCondition){
-            if(!(eventCounter % TRG_NUM_PER_FILE))
+            if(!(eventCounter++ % TRG_NUM_PER_FILE))
                 genFileName(fileCounter++,fileName,FILENAME_LEN);
 
             outFile = fopen(fileName, "ab");
-
-            eventCounter++;
 
             data.unixTime = htobe32((uint32_t)time(NULL));
             data.trgCount = htobe32(*(chkArg->fifoData+TRGCNT_IDX));
