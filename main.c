@@ -121,7 +121,7 @@ void* checkFifoThread(void *arg){
 
         exitCondition = (socketStatusLocal <= 0) || (cmdIDLocal == EXIT);
 
-        memset(gpsStr, '\0', DATA_GPS_BYTES);
+        memset(data.gpsStr, '\0', DATA_GPS_BYTES);
         memset(numericData, 0, DATA_NUMERICS);
 
         if(!exitCondition){
