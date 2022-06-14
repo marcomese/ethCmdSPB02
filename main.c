@@ -33,6 +33,10 @@
 #define FILENAME_LEN     50
 #define TRG_NUM_PER_FILE 25
 
+#define TRGCNT_IDX 0
+#define GTUCNT_IDX 1
+#define TRGFLG_IDX 2
+
 pthread_mutex_t mtx;
 
 typedef struct cmdDecodeArgs{
