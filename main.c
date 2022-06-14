@@ -98,17 +98,16 @@ void* cmdDecodeThread(void *arg){
 }
 
 void* checkFifoThread(void *arg){
+    FILE *outFile;
     chkFifoArgs_t* chkArg = (chkFifoArgs_t*)arg;
-    uint32_t eventCounter = 0;
-    uint32_t fileCounter = 0;
-    char fileName[FILENAME_LEN] = "";
-    uint32_t unixTime = 0;
+    unsigned int exitCondition = 0;
     int socketStatusLocal = 0;
     uint32_t cmdIDLocal = NONE;
-    unsigned int exitCondition = 0;
-    FILE *outFile;
-    //char gpsStr[DATA_GPS_BYTES] = "";
+    uint32_t eventCounter = 0;
+    uint32_t fileCounter = 0;
+    uint32_t unixTime = 0;
     uint32_t numericData[DATA_NUMERICS];
+    char fileName[FILENAME_LEN] = "";
     spb2Data_t data = {0, 0, 0, 0, ""};
 
     while(!exitCondition){
@@ -133,13 +132,10 @@ void* checkFifoThread(void *arg){
             eventCounter++;
             
             unixTime = htobe32((uint32_t)time(NULL));
-            //fwrite(&unixTime, sizeof(uint32_t), 1, outFile);
             data.unixTime = unixTime;
 
-            for(int i = 0; i < DATA_NUMERICS; i++)//{
+            for(int i = 0; i < DATA_NUMERICS; i++)
                 numericData[i] = htobe32(*(chkArg->fifoData+i));
-                //fwrite(&numericData, sizeof(uint32_t), 1, outFile);
-            //}
 
             data.trgCount = numericData[TRGCNT_IDX];
             data.gtuCount = numericData[GTUCNT_IDX];
@@ -151,8 +147,6 @@ void* checkFifoThread(void *arg){
                 data.gpsStr[(((i-DATA_NUMERICS)*4)+2)] = (char)((*(chkArg->fifoData+i) & 0x00FF0000) >> 16);
                 data.gpsStr[(((i-DATA_NUMERICS)*4)+3)] = (char)((*(chkArg->fifoData+i) & 0xFF000000) >> 24);
             }
-
-            //fwrite(gpsStr, sizeof(char), DATA_GPS_BYTES, outFile);
 
             fwrite(&data, sizeof(data), 1, outFile);
 
