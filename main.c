@@ -139,7 +139,7 @@ void* checkFifoThread(void *arg){
 
             data.trgCount = numericData[TRGCNT_IDX];
             data.gtuCount = numericData[GTUCNT_IDX];
-            data.trgFlag =  numericData[TRGFLG_IDX];
+            data.trgFlag  = numericData[TRGFLG_IDX];
 
             for(int i = DATA_NUMERICS; i < DATA_WORDS; i++){
                 data.gpsStr[((i-DATA_NUMERICS)*4)]     = (char)(*(chkArg->fifoData+i)  & 0x000000FF);
