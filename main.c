@@ -105,7 +105,7 @@ void* checkFifoThread(void *arg){
     FILE *outFile;
     //char gpsStr[DATA_GPS_BYTES] = "";
     uint32_t numericData[DATA_NUMERICS];
-    spb2Data_t data = {0, 0, 0, ""};
+    spb2Data_t data = {0, 0, 0, 0, ""};
 
     while(!exitCondition){
         dma_transfer_s2mm(chkArg->regs->dmaReg, DATA_BYTES, chkArg->socketStatus, chkArg->cmdID, &mtx);
