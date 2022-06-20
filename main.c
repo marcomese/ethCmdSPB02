@@ -23,6 +23,7 @@
 #define BIND_MAX_TRIES   10
 #define LISTEN_MAX_TRIES 10
 
+#define DATA_HEADER      0x424B4C43
 #define DATA_ADDR        0x00000000
 #define DATA_BYTES       512
 #define DATA_NUMERICS    3
@@ -54,6 +55,7 @@ typedef struct chkFifoArgs{
 } chkFifoArgs_t;
 
 typedef struct spb2Data{
+    uint32_t header;
     uint32_t unixTime;
     uint32_t trgCount;
     uint32_t gtuCount;
@@ -126,10 +128,11 @@ void* checkFifoThread(void *arg){
 
             outFile = fopen(fileName, "ab");
 
-            data.unixTime = htobe32((uint32_t)time(NULL));
-            data.trgCount = htobe32(*(chkArg->fifoData+TRGCNT_IDX));
-            data.gtuCount = htobe32(*(chkArg->fifoData+GTUCNT_IDX));
-            data.trgFlag  = htobe32(*(chkArg->fifoData+TRGFLG_IDX));
+            data.header   = DATA_HEADER;
+            data.unixTime = (uint32_t)time(NULL);
+            data.trgCount = *(chkArg->fifoData+TRGCNT_IDX);
+            data.gtuCount = *(chkArg->fifoData+GTUCNT_IDX);
+            data.trgFlag  = *(chkArg->fifoData+TRGFLG_IDX);
 
             for(int i = DATA_NUMERICS; i < DATA_WORDS; i++){
                 data.gpsStr[((i-DATA_NUMERICS)*4)]     = (char)(*(chkArg->fifoData+i)  & 0x000000FF);
