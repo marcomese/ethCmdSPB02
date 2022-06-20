@@ -108,7 +108,7 @@ void* checkFifoThread(void *arg){
     uint32_t eventCounter = 0;
     uint32_t fileCounter = 0;
     char fileName[FILENAME_LEN] = "";
-    spb2Data_t data = {0, 0, 0, 0, ""};
+    spb2Data_t data = {0, 0, 0, 0, 0, ""};
 
     while(!exitCondition){
         dma_transfer_s2mm(chkArg->regs->dmaReg, DATA_BYTES, chkArg->socketStatus, chkArg->cmdID, &mtx);
