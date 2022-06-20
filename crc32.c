@@ -11,7 +11,7 @@
  *
  */
 
-#include "../myincludes/crc32.h" /* describes this code */
+#include "crc32.h" /* describes this code */
 
 static const unsigned int crc32table[256] = {
 	/* 0x00 */ 0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA,
