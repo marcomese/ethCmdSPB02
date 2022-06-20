@@ -1,6 +1,6 @@
 CC = gcc
-DEPS = commands.h registers.h dma.h
-OBJ = main.o commands.o registers.o dma.o
+DEPS = commands.h registers.h dma.h crc32.h
+OBJ = main.o commands.o registers.o dma.o crc32.o
 LIBS = -lpthread
 DBG = 0
 

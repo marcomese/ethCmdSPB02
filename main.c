@@ -16,6 +16,7 @@
 #include "commands.h"
 #include "registers.h"
 #include "dma.h"
+#include "crc32.h"
 
 #define CONN_PORT        5000
 #define CONN_MAX_QUEUE   10
@@ -55,12 +56,13 @@ typedef struct chkFifoArgs{
 } chkFifoArgs_t;
 
 typedef struct spb2Data{
-    uint32_t header;
-    uint32_t unixTime;
-    uint32_t trgCount;
-    uint32_t gtuCount;
-    uint32_t trgFlag;
-    char     gpsStr[DATA_GPS_BYTES];
+    uint32_t     header;
+    uint32_t     unixTime;
+    uint32_t     trgCount;
+    uint32_t     gtuCount;
+    uint32_t     trgFlag;
+    char         gpsStr[DATA_GPS_BYTES];
+    unsigned int crc;
 } spb2Data_t;
 
 void genFileName(uint32_t fileCounter, char* fileName, uint32_t fileNameLen){
@@ -108,7 +110,7 @@ void* checkFifoThread(void *arg){
     uint32_t eventCounter = 0;
     uint32_t fileCounter = 0;
     char fileName[FILENAME_LEN] = "";
-    spb2Data_t data = {0, 0, 0, 0, 0, ""};
+    spb2Data_t data = {0, 0, 0, 0, 0, "", 0};
 
     while(!exitCondition){
         dma_transfer_s2mm(chkArg->regs->dmaReg, DATA_BYTES, chkArg->socketStatus, chkArg->cmdID, &mtx);
@@ -140,6 +142,8 @@ void* checkFifoThread(void *arg){
                 data.gpsStr[(((i-DATA_NUMERICS)*4)+2)] = (char)((*(chkArg->fifoData+i) & 0x00FF0000) >> 16);
                 data.gpsStr[(((i-DATA_NUMERICS)*4)+3)] = (char)((*(chkArg->fifoData+i) & 0xFF000000) >> 24);
             }
+
+            data.crc = crc_32((unsigned char *)&data, sizeof(data)-sizeof(data.crc), startCRC32);
 
             fwrite(&data, sizeof(data), 1, outFile);
 
