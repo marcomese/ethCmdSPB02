@@ -27,7 +27,7 @@
 #define DATA_HEADER      0x424B4C43
 #define DATA_ADDR        0x00000000
 #define DATA_BYTES       512
-#define DATA_NUMERICS    3
+#define DATA_NUMERICS    6
 #define DATA_WORDS       (DATA_BYTES/4)
 #define DATA_GPS_BYTES   (DATA_BYTES-(DATA_NUMERICS*4))
 
@@ -38,6 +38,9 @@
 #define TRGCNT_IDX 0
 #define GTUCNT_IDX 1
 #define TRGFLG_IDX 2
+#define ALIVET_IDX 3
+#define DEADT_IDX  4
+#define STATUS_IDX 5
 
 pthread_mutex_t mtx;
 
@@ -61,6 +64,9 @@ typedef struct spb2Data{
     uint32_t     trgCount;
     uint32_t     gtuCount;
     uint32_t     trgFlag;
+    uint32_t     aliveTime;
+    uint32_t     deadTime;
+    uint32_t     status;
     char         gpsStr[DATA_GPS_BYTES];
     unsigned int crc;
 } spb2Data_t;
@@ -130,11 +136,14 @@ void* checkFifoThread(void *arg){
 
             outFile = fopen(fileName, "ab");
 
-            data.header   = DATA_HEADER;
-            data.unixTime = (uint32_t)time(NULL);
-            data.trgCount = *(chkArg->fifoData+TRGCNT_IDX);
-            data.gtuCount = *(chkArg->fifoData+GTUCNT_IDX);
-            data.trgFlag  = *(chkArg->fifoData+TRGFLG_IDX);
+            data.header    = DATA_HEADER;
+            data.unixTime  = (uint32_t)time(NULL);
+            data.trgCount  = *(chkArg->fifoData+TRGCNT_IDX);
+            data.gtuCount  = *(chkArg->fifoData+GTUCNT_IDX);
+            data.trgFlag   = *(chkArg->fifoData+TRGFLG_IDX);
+            data.aliveTime = *(chkArg->fifoData+ALIVET_IDX);
+            data.deadTime  = *(chkArg->fifoData+DEADT_IDX);
+            data.status    = *(chkArg->fifoData+STATUS_IDX);
 
             for(int i = DATA_NUMERICS; i < DATA_WORDS; i++){
                 data.gpsStr[((i-DATA_NUMERICS)*4)]     = (char)(*(chkArg->fifoData+i)  & 0x000000FF);
