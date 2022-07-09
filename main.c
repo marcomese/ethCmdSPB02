@@ -12,9 +12,11 @@
 #include <sys/mman.h>
 #include <pthread.h>
 #include <time.h>
+#include <endian.h>
 #include "commands.h"
 #include "registers.h"
 #include "dma.h"
+#include "crc32.h"
 
 #define CONN_PORT        5000
 #define CONN_MAX_QUEUE   10
@@ -22,15 +24,25 @@
 #define BIND_MAX_TRIES   10
 #define LISTEN_MAX_TRIES 10
 
-#define DATA_ADDR        0x02000000
-#define FIFO_DATA_LEN    3 // al momento leggo solo le prime due word che contengono il trg counter ed il gtu counter + trigger flag (7 bit)
-#define FIFO_EMPTY_FLAG  1U << 13U
+#define DATA_HEADER      0x424B4C43
+#define DATA_ADDR        0x00000000
+#define DATA_BYTES       512
+#define DATA_NUMERICS    6
+#define DATA_WORDS       (DATA_BYTES/4)
+#define DATA_GPS_BYTES   (DATA_BYTES-(DATA_NUMERICS*4))
 
 #define UNIXTIME_LEN     15
 #define FILENAME_LEN     50
 #define TRG_NUM_PER_FILE 25
 
-pthread_mutex_t mtx; // portare dentro cmdDecodeArgs_t e chkFifoArg_t e dichiararla in main
+#define TRGCNT_IDX 0
+#define GTUCNT_IDX 1
+#define TRGFLG_IDX 2
+#define ALIVET_IDX 3
+#define DEADT_IDX  4
+#define STATUS_IDX 5
+
+pthread_mutex_t mtx;
 
 typedef struct cmdDecodeArgs{
     axiRegisters_t* regs;
@@ -56,6 +68,18 @@ void getUnixTime(char* unixTime){
 
     return;
 }
+typedef struct spb2Data{
+    uint32_t     header;
+    uint32_t     unixTime;
+    uint32_t     trgCount;
+    uint32_t     gtuCount;
+    uint32_t     trgFlag;
+    uint32_t     aliveTime;
+    uint32_t     deadTime;
+    uint32_t     status;
+    char         gpsStr[DATA_GPS_BYTES];
+    unsigned int crc;
+} spb2Data_t;
 
 void genFileName(uint32_t fileCounter, char* fileName, uint32_t fileNameLen){
     time_t rawtime = time(NULL);
@@ -94,18 +118,18 @@ void* cmdDecodeThread(void *arg){
 }
 
 void* checkFifoThread(void *arg){
+    FILE *outFile;
     chkFifoArgs_t* chkArg = (chkFifoArgs_t*)arg;
+    unsigned int exitCondition = 0;
+    int socketStatusLocal = 0;
+    uint32_t cmdIDLocal = NONE;
     uint32_t eventCounter = 0;
     uint32_t fileCounter = 0;
     char fileName[FILENAME_LEN] = "";
-    char unixTime[UNIXTIME_LEN] = "";
-    int socketStatusLocal = 0;
-    uint32_t cmdIDLocal = NONE;
-    unsigned int exitCondition = 0;
-    FILE *outFile;
+    spb2Data_t data = {0, 0, 0, 0, 0, 0, 0, 0, "", 0};
 
     while(!exitCondition){
-        dma_transfer_s2mm(chkArg->regs->dmaReg, 128, chkArg->socketStatus, chkArg->cmdID, &mtx);
+        dma_transfer_s2mm(chkArg->regs->dmaReg, DATA_BYTES, chkArg->socketStatus, chkArg->cmdID, &mtx);
 
         pthread_mutex_lock(&mtx);
         socketStatusLocal = *chkArg->socketStatus;
@@ -114,29 +138,35 @@ void* checkFifoThread(void *arg){
 
         exitCondition = (socketStatusLocal <= 0) || (cmdIDLocal == EXIT);
 
+        memset(data.gpsStr, '\0', DATA_GPS_BYTES);
+
         if(!exitCondition){
-            if(!(eventCounter % TRG_NUM_PER_FILE)){
+            if(!(eventCounter++ % TRG_NUM_PER_FILE))
                 genFileName(fileCounter++,fileName,FILENAME_LEN);
+
+            outFile = fopen(fileName, "ab");
+
+            data.header    = DATA_HEADER;
+            data.unixTime  = (uint32_t)time(NULL);
+            data.trgCount  = *(chkArg->fifoData+TRGCNT_IDX);
+            data.gtuCount  = *(chkArg->fifoData+GTUCNT_IDX);
+            data.trgFlag   = *(chkArg->fifoData+TRGFLG_IDX);
+            data.aliveTime = *(chkArg->fifoData+ALIVET_IDX);
+            data.deadTime  = *(chkArg->fifoData+DEADT_IDX);
+            data.status    = *(chkArg->fifoData+STATUS_IDX);
+
+            for(int i = DATA_NUMERICS; i < DATA_WORDS; i++){
+                data.gpsStr[((i-DATA_NUMERICS)*4)]     = (char)(*(chkArg->fifoData+i)  & 0x000000FF);
+                data.gpsStr[(((i-DATA_NUMERICS)*4)+1)] = (char)((*(chkArg->fifoData+i) & 0x0000FF00) >> 8);
+                data.gpsStr[(((i-DATA_NUMERICS)*4)+2)] = (char)((*(chkArg->fifoData+i) & 0x00FF0000) >> 16);
+                data.gpsStr[(((i-DATA_NUMERICS)*4)+3)] = (char)((*(chkArg->fifoData+i) & 0xFF000000) >> 24);
             }
 
-            outFile = fopen(fileName, "a");
+            data.crc = crc_32((unsigned char *)&data, sizeof(data)-sizeof(data.crc), startCRC32);
 
-            eventCounter++;
-
-            getUnixTime(unixTime);
-
-            fprintf(outFile, "%s,", unixTime);
-
-            for(int i = 0; i < FIFO_DATA_LEN; i++){
-                fprintf(outFile, "%u", (unsigned int)(*(chkArg->fifoData+i)));
-                if(i != FIFO_DATA_LEN-1)
-                    fprintf(outFile, ",");
-            }
-
-            fprintf(outFile,"\n");
+            fwrite(&data, sizeof(data), 1, outFile);
 
             fclose(outFile);
-
         }
     }
 
