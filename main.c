@@ -145,7 +145,7 @@ void* checkFifoThread(void *arg){
         cmdIDLocal = *chkArg->cmdID;
         pthread_mutex_unlock(&mtx);
 
-        exitCondition = (socketStatusLocal <= 0) || (cmdIDLocal == EXIT) || (runnning = 0);
+        exitCondition = (socketStatusLocal <= 0) || (cmdIDLocal == EXIT) || (running = 0);
 
         memset(data.gpsStr, '\0', DATA_GPS_BYTES);
 
