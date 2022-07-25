@@ -42,6 +42,8 @@
 #define DEADT_IDX  4
 #define STATUS_IDX 5
 
+#define RUN_STATUS_MASK 0x01
+
 pthread_mutex_t mtx;
 
 typedef struct cmdDecodeArgs{
@@ -83,6 +85,17 @@ void genFileName(uint32_t fileCounter, char* fileName, uint32_t fileNameLen){
     return;
 }
 
+void unlockFile(char* fileName){
+    char unlockedFileName[FILENAME_LEN] = "";
+
+    if(strncmp(fileName,"",FILENAME_LEN) != 0){
+        strncpy(unlockedFileName,fileName,strlen(fileName)-5);
+        rename(fileName,unlockedFileName);
+    }
+
+    return;
+}
+
 void* cmdDecodeThread(void *arg){
     cmdDecodeArgs_t* cmdArg = (cmdDecodeArgs_t*)arg;
     const char *welcomeStr = "CLK BOARD\n";
@@ -111,12 +124,13 @@ void* checkFifoThread(void *arg){
     FILE *outFile;
     chkFifoArgs_t* chkArg = (chkFifoArgs_t*)arg;
     unsigned int exitCondition = 0;
+    uint32_t statusReg = 0;
+    uint32_t running = 0;
     int socketStatusLocal = 0;
     uint32_t cmdIDLocal = NONE;
     uint32_t eventCounter = 0;
     uint32_t fileCounter = 0;
     char fileName[FILENAME_LEN] = "";
-    char unlockedFileName[FILENAME_LEN] = "";
     spb2Data_t data = {0, 0, 0, 0, 0, 0, 0, 0, "", 0};
 
     while(!exitCondition){
@@ -127,19 +141,20 @@ void* checkFifoThread(void *arg){
         cmdIDLocal = *chkArg->cmdID;
         pthread_mutex_unlock(&mtx);
 
-        exitCondition = (socketStatusLocal <= 0) || (cmdIDLocal == EXIT);
+        statusReg = *(chkArg->fifoData+STATUS_IDX);
+
+        running = statusReg & RUN_STATUS_MASK;
+
+        exitCondition = (socketStatusLocal <= 0) || (cmdIDLocal == EXIT) || (running == 0);
 
         memset(data.gpsStr, '\0', DATA_GPS_BYTES);
 
         if(!exitCondition){
             if(!(eventCounter++ % TRG_NUM_PER_FILE)){
-                if(strncmp(fileName,"",FILENAME_LEN) != 0){
-                    memset(unlockedFileName,'\0',FILENAME_LEN);
-                    strncpy(unlockedFileName,fileName,strlen(fileName)-5);
-                    rename(fileName,unlockedFileName);
-                }
+                unlockFile(fileName);
                 genFileName(fileCounter++,fileName,FILENAME_LEN);
             }
+
             outFile = fopen(fileName, "ab");
 
             data.header    = DATA_HEADER;
@@ -149,7 +164,7 @@ void* checkFifoThread(void *arg){
             data.trgFlag   = *(chkArg->fifoData+TRGFLG_IDX);
             data.aliveTime = *(chkArg->fifoData+ALIVET_IDX);
             data.deadTime  = *(chkArg->fifoData+DEADT_IDX);
-            data.status    = *(chkArg->fifoData+STATUS_IDX);
+            data.status    = statusReg;
 
             for(int i = DATA_NUMERICS; i < DATA_WORDS; i++){
                 data.gpsStr[((i-DATA_NUMERICS)*4)]     = (char)(*(chkArg->fifoData+i)  & 0x000000FF);
@@ -163,7 +178,8 @@ void* checkFifoThread(void *arg){
             fwrite(&data, sizeof(data), 1, outFile);
 
             fclose(outFile);
-        }
+        }else
+            unlockFile(fileName);
     }
 
     pthread_exit((void *)chkArg->fifoData);
