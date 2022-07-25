@@ -32,7 +32,7 @@
 #define DATA_GPS_BYTES   (DATA_BYTES-(DATA_NUMERICS*4))
 
 #define UNIXTIME_LEN     15
-#define FILENAME_LEN     50
+#define FILENAME_LEN     55
 #define TRG_NUM_PER_FILE 25
 
 #define TRGCNT_IDX 0
@@ -75,7 +75,7 @@ void genFileName(uint32_t fileCounter, char* fileName, uint32_t fileNameLen){
     time_t rawtime = time(NULL);
     struct tm *ptm = localtime(&rawtime);
 
-    snprintf(fileName, fileNameLen, "/srv/ftp/clkb_event_%04d%02d%02d%02d%02d%02d-%04d.dat",
+    snprintf(fileName, fileNameLen, "/srv/ftp/clkb_event_%04d%02d%02d%02d%02d%02d-%04d.dat.lock",
              ptm->tm_year + 1900, ptm->tm_mon + 1, ptm->tm_mday,
              ptm->tm_hour, ptm->tm_min, ptm->tm_sec,
              fileCounter);
@@ -116,6 +116,7 @@ void* checkFifoThread(void *arg){
     uint32_t eventCounter = 0;
     uint32_t fileCounter = 0;
     char fileName[FILENAME_LEN] = "";
+    char unlockedFileName[FILENAME_LEN] = "";
     spb2Data_t data = {0, 0, 0, 0, 0, 0, 0, 0, "", 0};
 
     while(!exitCondition){
@@ -131,9 +132,12 @@ void* checkFifoThread(void *arg){
         memset(data.gpsStr, '\0', DATA_GPS_BYTES);
 
         if(!exitCondition){
-            if(!(eventCounter++ % TRG_NUM_PER_FILE))
+            if(!(eventCounter++ % TRG_NUM_PER_FILE)){
+                unlockedFileName = "";
+                strncpy(unlockedFileName,fileName,strlen(fileName)-5);
+                rename(fileName,unlockedFileName);
                 genFileName(fileCounter++,fileName,FILENAME_LEN);
-
+            }
             outFile = fopen(fileName, "ab");
 
             data.header    = DATA_HEADER;
