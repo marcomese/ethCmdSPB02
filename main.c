@@ -134,7 +134,7 @@ void* checkFifoThread(void *arg){
     spb2Data_t data = {0, 0, 0, 0, 0, 0, 0, 0, "", 0};
 
     while(!exitCondition){
-        statusReg = *(chkArg->fifoData+STATUS_IDX);
+        statusReg = *(chkArg->regs->statusReg);
 
         running = statusReg & RUN_STATUS_MASK;
 
