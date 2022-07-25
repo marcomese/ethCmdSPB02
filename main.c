@@ -133,7 +133,7 @@ void* checkFifoThread(void *arg){
 
         if(!exitCondition){
             if(!(eventCounter++ % TRG_NUM_PER_FILE)){
-                unlockedFileName = "";
+                memset(unlockedFileName, '\0', FILENAME_LEN);
                 strncpy(unlockedFileName,fileName,strlen(fileName)-5);
                 rename(fileName,unlockedFileName);
                 genFileName(fileCounter++,fileName,FILENAME_LEN);
