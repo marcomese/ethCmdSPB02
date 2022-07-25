@@ -145,11 +145,11 @@ void* checkFifoThread(void *arg){
 
         running = statusReg & RUN_STATUS_MASK;
 
-        exitCondition = (socketStatusLocal <= 0) || (cmdIDLocal == EXIT) || (running == 0);
+        exitCondition = (socketStatusLocal <= 0) || (cmdIDLocal == EXIT);
 
         memset(data.gpsStr, '\0', DATA_GPS_BYTES);
 
-        if(!exitCondition){
+        if(!exitCondition && running){
             if(!(eventCounter++ % TRG_NUM_PER_FILE)){
                 unlockFile(fileName);
                 genFileName(fileCounter++,fileName,FILENAME_LEN);
