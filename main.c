@@ -134,6 +134,12 @@ void* checkFifoThread(void *arg){
     spb2Data_t data = {0, 0, 0, 0, 0, 0, 0, 0, "", 0};
 
     while(!exitCondition){
+        if(!running){
+            eventCounter = 0;
+            fileCounter = 0;
+            unlockFile(fileName);
+        }
+
         dma_transfer_s2mm(chkArg->regs->dmaReg, DATA_BYTES, chkArg->socketStatus, chkArg->cmdID, &mtx);
 
         pthread_mutex_lock(&mtx);
@@ -153,12 +159,6 @@ void* checkFifoThread(void *arg){
             if(!(eventCounter++ % TRG_NUM_PER_FILE)){
                 unlockFile(fileName);
                 genFileName(fileCounter++,fileName,FILENAME_LEN);
-            }
-
-            if(!running){
-                eventCounter = 0;
-                fileCounter = 0;
-                unlockFile(fileName);
             }
 
             outFile = fopen(fileName, "ab");
