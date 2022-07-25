@@ -149,10 +149,16 @@ void* checkFifoThread(void *arg){
 
         memset(data.gpsStr, '\0', DATA_GPS_BYTES);
 
-        if(!exitCondition && running){
+        if(!exitCondition){
             if(!(eventCounter++ % TRG_NUM_PER_FILE)){
                 unlockFile(fileName);
                 genFileName(fileCounter++,fileName,FILENAME_LEN);
+            }
+
+            if(!running){
+                eventCounter = 0;
+                fileCounter = 0;
+                unlockFile(fileName);
             }
 
             outFile = fopen(fileName, "ab");
