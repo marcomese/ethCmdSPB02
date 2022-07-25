@@ -138,9 +138,8 @@ void* checkFifoThread(void *arg){
             eventCounter = 0;
             fileCounter = 0;
             unlockFile(fileName);
-        }
-
-        dma_transfer_s2mm(chkArg->regs->dmaReg, DATA_BYTES, chkArg->socketStatus, chkArg->cmdID, &mtx);
+        }else
+            dma_transfer_s2mm(chkArg->regs->dmaReg, DATA_BYTES, chkArg->socketStatus, chkArg->cmdID, &mtx);
 
         pthread_mutex_lock(&mtx);
         socketStatusLocal = *chkArg->socketStatus;
@@ -155,7 +154,7 @@ void* checkFifoThread(void *arg){
 
         memset(data.gpsStr, '\0', DATA_GPS_BYTES);
 
-        if(!exitCondition){
+        if(!exitCondition && running){
             if(!(eventCounter++ % TRG_NUM_PER_FILE)){
                 unlockFile(fileName);
                 genFileName(fileCounter++,fileName,FILENAME_LEN);
