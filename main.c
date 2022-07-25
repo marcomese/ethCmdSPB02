@@ -178,8 +178,11 @@ void* checkFifoThread(void *arg){
             fwrite(&data, sizeof(data), 1, outFile);
 
             fclose(outFile);
-        }else
+        }else{
+            eventCounter = 0;
+            fileCounter = 0;
             unlockFile(fileName);
+        }
     }
 
     pthread_exit((void *)chkArg->fifoData);
