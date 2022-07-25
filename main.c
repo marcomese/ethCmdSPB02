@@ -134,27 +134,22 @@ void* checkFifoThread(void *arg){
     spb2Data_t data = {0, 0, 0, 0, 0, 0, 0, 0, "", 0};
 
     while(!exitCondition){
-        if(!running){
-            eventCounter = 0;
-            fileCounter = 0;
-            unlockFile(fileName);
-        }else
-            dma_transfer_s2mm(chkArg->regs->dmaReg, DATA_BYTES, chkArg->socketStatus, chkArg->cmdID, &mtx);
+        statusReg = *(chkArg->fifoData+STATUS_IDX);
+
+        running = statusReg & RUN_STATUS_MASK;
+
+        dma_transfer_s2mm(chkArg->regs->dmaReg, DATA_BYTES, chkArg->socketStatus, chkArg->cmdID, running, &mtx);
 
         pthread_mutex_lock(&mtx);
         socketStatusLocal = *chkArg->socketStatus;
         cmdIDLocal = *chkArg->cmdID;
         pthread_mutex_unlock(&mtx);
 
-        statusReg = *(chkArg->fifoData+STATUS_IDX);
-
-        running = statusReg & RUN_STATUS_MASK;
-
-        exitCondition = (socketStatusLocal <= 0) || (cmdIDLocal == EXIT);
+        exitCondition = (socketStatusLocal <= 0) || (cmdIDLocal == EXIT) || (runnning = 0);
 
         memset(data.gpsStr, '\0', DATA_GPS_BYTES);
 
-        if(!exitCondition && running){
+        if(!exitCondition){
             if(!(eventCounter++ % TRG_NUM_PER_FILE)){
                 unlockFile(fileName);
                 genFileName(fileCounter++,fileName,FILENAME_LEN);
