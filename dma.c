@@ -20,7 +20,7 @@ int dma_s2mm_sync(unsigned int *virtual_addr, int* socketStatus, uint32_t* cmdID
         s2mm_status = read_dma(virtual_addr, S2MM_STATUS_REGISTER);
 
         pthread_mutex_lock(mtx);
-        exitCondition = (*socketStatus <= 0) || (*cmdID == EXIT) || (*running == 0);
+        exitCondition = (*socketStatus <= 0) || (*cmdID == EXIT) || (((*running) & 1) == 0);
         pthread_mutex_unlock(mtx);
     }
 

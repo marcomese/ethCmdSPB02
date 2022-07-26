@@ -138,7 +138,7 @@ void* checkFifoThread(void *arg){
 
         running = statusReg & RUN_STATUS_MASK;
 
-        dma_transfer_s2mm(chkArg->regs->dmaReg, DATA_BYTES, chkArg->socketStatus, chkArg->cmdID, &running, &mtx);
+        dma_transfer_s2mm(chkArg->regs->dmaReg, DATA_BYTES, chkArg->socketStatus, chkArg->cmdID, chkArg->regs->statusReg, &mtx);
 
         pthread_mutex_lock(&mtx);
         socketStatusLocal = *chkArg->socketStatus;
