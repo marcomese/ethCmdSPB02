@@ -30,8 +30,8 @@ const char statusIDStr[32][STATUS_ID_MAX_LEN] = {
     "",
     "",
     "",
-    "",
-    "",
+    "GPS1=",
+    "GPS2=",
     "",
     "",
     "",
@@ -143,14 +143,16 @@ static cmd_t commands[] = {
     {"trg",           TRIGGER,         "TRIGGER\n",         writeCmd, CTRL_REG_ADDR,   CMD_RECV_ADDR},
     {"gps reset",     RESET_GPS,       "RESET GPS\n",       writeCmd, CTRL_REG_ADDR,   CMD_RECV_ADDR},
     {"gps configure", CONFIGURE_GPS,   "CONFIGURE GPS\n",   writeCmd, CTRL_REG_ADDR,   CMD_RECV_ADDR},
-    {"gps no",        NO_GPS,          "NO GPS\n",          writeCmd, CTRL_REG_ADDR,   CMD_RECV_ADDR},
-    {"gps on",        GPS_ON,          "GPS ON\n",          writeCmd, CTRL_REG_ADDR,   CMD_RECV_ADDR},
+    {"gps1 on",       GPS1_ON,         "GPS1 ON\n",         writeCmd, CTRL_REG_ADDR,   CMD_RECV_ADDR},
+    {"gps2 on",       GPS2_ON,         "GPS2 ON\n",         writeCmd, CTRL_REG_ADDR,   CMD_RECV_ADDR},
+    {"gps1 off",      NO_GPS1,         "NO GPS1\n",         writeCmd, CTRL_REG_ADDR,   CMD_RECV_ADDR},
+    {"gps2 off",      NO_GPS2,         "NO GPS2\n",         writeCmd, CTRL_REG_ADDR,   CMD_RECV_ADDR},
     {"gtu reset",     RESET_GTU_COUNT, "RESET GTU COUNT\n", writeCmd, CTRL_REG_ADDR,   CMD_RECV_ADDR},
     {"pck reset",     RESET_PACKET_NR, "RESET PACKET NR\n", writeCmd, CTRL_REG_ADDR,   CMD_RECV_ADDR},
     {"trg reset",     RESET_TRG_COUNT, "RESET TRG COUNT\n", writeCmd, CTRL_REG_ADDR,   CMD_RECV_ADDR},
     {"all reset",     RESET_ALL_COUNT, "RESET ALL COUNT\n", writeCmd, CTRL_REG_ADDR,   CMD_RECV_ADDR},
-    {"pps on",        PPS_TRG_ON,      "PPS TRG ON\n",      writeCmd, CTRL_REG_ADDR,   CMD_RECV_ADDR},
-    {"pps off",       PPS_TRG_OFF,     "PPS TRG OFF\n",     writeCmd, CTRL_REG_ADDR,   CMD_RECV_ADDR},
+    {"ppstrg on",     PPS_TRG_ON,      "PPS TRG ON\n",      writeCmd, CTRL_REG_ADDR,   CMD_RECV_ADDR},
+    {"ppstrg off",    PPS_TRG_OFF,     "PPS TRG OFF\n",     writeCmd, CTRL_REG_ADDR,   CMD_RECV_ADDR},
     {"msk exttrg",    MASK_EXT_TRG,    "MASK EXT TRG\n",    writeCmd, CTRL_REG_ADDR,   CMD_RECV_ADDR},
     {"usk exttrg",    UNMASK_EXT_TRG,  "UNMASK EXT TRG\n",  writeCmd, CTRL_REG_ADDR,   CMD_RECV_ADDR},
     {"trg self on",   SELF_TRG,        "SELF TRG ON\n",     writeCmd, CTRL_REG_ADDR,   CMD_RECV_ADDR},
@@ -189,7 +191,8 @@ uint32_t decodeCmdStr(axiRegisters_t* regDev, int connfd, char *ethStr){
     char cmdStr[CMD_MAX_LEN] = "";
 
     for (int i = 0; (ethStr[i] != '\r') && (ethStr[i] != '\n'); i++)
-        cmdStr[i] = ethStr[i];
+        if (i < CMD_MAX_LEN)
+            cmdStr[i] = ethStr[i];
 
     cmd_t *cmd = getCmd(cmdStr);
 

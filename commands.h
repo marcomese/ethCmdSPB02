@@ -25,8 +25,8 @@
 #define TRIGGER         0x06
 #define RESET_GPS       0x07
 #define CONFIGURE_GPS   0x08
-#define NO_GPS          0x09
-#define GPS_ON          0x0A
+#define GPS1_ON         0x09
+#define GPS2_ON         0x0A
 #define RESET_GTU_COUNT 0x0B
 #define RESET_PACKET_NR 0x0C
 #define RESET_TRG_COUNT 0x0D
@@ -49,6 +49,8 @@
 #define READ_L11COUNTER 0x1E
 #define READ_L12COUNTER 0x1F
 #define READ_L13COUNTER 0x20
+#define GPS1_NO         0x21
+#define GPS2_NO         0x22
 
 #define EXIT            0xFF
 
