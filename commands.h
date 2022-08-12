@@ -51,6 +51,8 @@
 #define READ_L13COUNTER 0x20
 #define NO_GPS1         0x21
 #define NO_GPS2         0x22
+#define GPSAUTO_ON      0x23
+#define GPSAUTO_NO      0x24
 
 #define EXIT            0xFF
 
