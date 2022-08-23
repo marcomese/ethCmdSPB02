@@ -149,7 +149,7 @@ void* checkFifoThread(void *arg){
 
         memset(data.gpsStr, '\0', DATA_GPS_BYTES);
 
-        if(!exitCondition){// && running){
+        if(!exitCondition && running){
             if(!(eventCounter++ % TRG_NUM_PER_FILE)){
                 unlockFile(fileName);
                 genFileName(fileCounter++,fileName,FILENAME_LEN);
