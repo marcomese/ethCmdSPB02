@@ -211,8 +211,9 @@ void* canReaderThread(void *arg){
 
     printf("0x%03X [%d] ",frame.can_id, frame.can_dlc);
     
-    for (i = 0; i < frame.can_dlc; i++)
+    for (int i = 0; i < frame.can_dlc; i++)
         printf("%02X ",frame.data[i]);
+
     printf("\r\n");
 }
 
