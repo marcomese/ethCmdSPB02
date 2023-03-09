@@ -246,12 +246,12 @@ void* canReaderThread(void *arg){
             memcpy(canArg->gyro,gyro,sizeof(gyro));
 
             printf("\tT = %ds\n\t\tax = %d, ay = %d, az = %d\n\t\tgx = %d, gy = %d, gz = %d\n",*canArg->imuTimestamp,
-                                                                                                *canArg->accel[0],
-                                                                                                *canArg->accel[1],
-                                                                                                *canArg->accel[2],
-                                                                                                *canArg->gyro[0],
-                                                                                                *canArg->gyro[1],
-                                                                                                *canArg->gyro[2]);
+                                                                                                canArg->accel[0],
+                                                                                                canArg->accel[1],
+                                                                                                canArg->accel[2],
+                                                                                                canArg->gyro[0],
+                                                                                                canArg->gyro[1],
+                                                                                                canArg->gyro[2]);
         }
 
     }
