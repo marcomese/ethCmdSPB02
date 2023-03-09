@@ -198,31 +198,26 @@ void* checkFifoThread(void *arg){
 }
 
 void* canReaderThread(void *arg){
-    int nBytes;
+    int nBytes = 0;
     struct can_frame frame;
     canReaderArgs_t* canArg = (canReaderArgs_t*)arg;
 
-    printf("Reading from CAN...\n");
+    while(1){
+        nBytes = read(canArg->canSocket, &frame, sizeof(struct can_frame));
 
-    nBytes = read(canArg->canSocket, &frame, sizeof(struct can_frame));
+        if(nBytes < 0) {
+            fprintf(stderr,"ERR: cannot read from CAN...\n");
+            pthread_exit((void *)nBytes);
+        }
 
-    printf("%d bytes read from CAN...\n",nBytes);
+        printf("0x%03X [%d] ",frame.can_id, frame.can_dlc);
+        
+        for (int i = 0; i < frame.can_dlc; i++)
+            printf("%02X ",frame.data[i]);
 
-    if(nBytes < 0) {
-        fprintf(stderr,"ERR: cannot read from CAN...\n");
-        pthread_exit((void *)nBytes);
+        printf("\n");
     }
 
-    printf("Data read:\n");
-
-    printf("0x%03X [%d] ",frame.can_id, frame.can_dlc);
-    
-    for (int i = 0; i < frame.can_dlc; i++)
-        printf("%02X ",frame.data[i]);
-
-    printf("\r\n");
-
-    printf("end\n");
 }
 
 int main(int argc, char *argv[]){
@@ -364,8 +359,6 @@ int main(int argc, char *argv[]){
 
     canReaderArgs.canSocket = canSocket;
     canReaderArgs.canData = &canData;
-
-    printf("All ready!\n");
 
     while (1)
     {
