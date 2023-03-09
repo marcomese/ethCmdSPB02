@@ -222,7 +222,7 @@ void* canReaderThread(void *arg){
             pthread_exit((void *)nBytes);
         }
 
-/*         switch(dataIdx){
+        switch(dataIdx){
             case CAN_TIMESTAMP_ID:
             timestamp = frame.data[1]       |
                         frame.data[2] << 8  |
@@ -239,9 +239,7 @@ void* canReaderThread(void *arg){
             case CAN_GZ_ID:
                 gyro[dataIdx-CAN_GX_ID] = frame.data[1] | frame.data[2] << 8;
                 break;
-            default:
-                continue;
-        } */
+        }
 
         printf("0x%03X [%d] ",frame.can_id, frame.can_dlc);
         
