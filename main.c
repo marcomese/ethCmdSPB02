@@ -202,12 +202,18 @@ void* canReaderThread(void *arg){
     struct can_frame frame;
     canReaderArgs_t* canArg = (canReaderArgs_t*)arg;
 
+    printf("Reading from CAN...\n");
+
     nBytes = read(canArg->canSocket, &frame, sizeof(struct can_frame));
 
+    printf("%d bytes read from CAN...\n",nBytes);
+
     if(nBytes < 0) {
-        printf("ERR: cannot read from CAN...\n");
+        fprintf(stderr,"ERR: cannot read from CAN...\n");
         pthread_exit((void *)nBytes);
     }
+
+    printf("Data read:\n");
 
     printf("0x%03X [%d] ",frame.can_id, frame.can_dlc);
     
@@ -215,6 +221,8 @@ void* canReaderThread(void *arg){
         printf("%02X ",frame.data[i]);
 
     printf("\r\n");
+
+    printf("end\n");
 }
 
 int main(int argc, char *argv[]){
