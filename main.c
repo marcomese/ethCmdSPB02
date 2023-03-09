@@ -243,14 +243,8 @@ void* canReaderThread(void *arg){
                 break;
         }
 
-        printf("0x%03X [%d] ",frame.can_id, frame.can_dlc);
-        
-        for (int i = 0; i < frame.can_dlc; i++)
-            printf("%02X ",frame.data[i]);
-
-        printf("\n");
-
-        printf("I = %d\n\tT = %d\n\t\tax = %d, ay = %d, az = %d\n\t\tgx = %d, gy = %d, gz = %d\n",dataIdx,timestamp,accel[0],accel[1],accel[2],gyro[0],gyro[1],gyro[2]);
+        if(dataIdx >= CAN_TIMESTAMP_ID && dataIdx <= CAN_GZ_ID)
+            printf("I = %d\n\tT = %d\n\t\tax = %d, ay = %d, az = %d\n\t\tgx = %d, gy = %d, gz = %d\n",dataIdx,timestamp,accel[0],accel[1],accel[2],gyro[0],gyro[1],gyro[2]);
 
     }
 
