@@ -242,8 +242,8 @@ void* canReaderThread(void *arg){
 
         if(dataIdx == CAN_GZ_ID){
             *canArg->imuTimestamp = (uint32_t)timestamp*39e-6;
-            *canArg->accel = accel;
-            *canArg->gyro = gyro;
+            memcpy(canArg->accel,accel,sizeof(accel));
+            memcpy(canArg->gyro,gyro,sizeof(gyro));
 
             printf("\tT = %ds\n\t\tax = %d, ay = %d, az = %d\n\t\tgx = %d, gy = %d, gz = %d\n",*canArg->imuTimestamp,
                                                                                                 *canArg->accel[0],
