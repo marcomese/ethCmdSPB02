@@ -353,6 +353,8 @@ int main(int argc, char *argv[]){
         }
     }
 
+    printf("All ready!\n");
+
     while (1)
     {
         cmdID = NONE;
