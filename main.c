@@ -243,7 +243,7 @@ void* canReaderThread(void *arg){
                 break;
         }
 
-        if(dataIdx >= CAN_TIMESTAMP_ID && dataIdx <= CAN_GZ_ID)
+        if(dataIdx == CAN_GZ_ID)
             printf("I = %d\n\tT = %d\n\t\tax = %d, ay = %d, az = %d\n\t\tgx = %d, gy = %d, gz = %d\n",dataIdx,timestamp,accel[0],accel[1],accel[2],gyro[0],gyro[1],gyro[2]);
 
     }
