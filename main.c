@@ -205,7 +205,7 @@ void* canReaderThread(void *arg){
     nBytes = read(canArg->canSocket, &frame, sizeof(struct can_frame));
 
     if(nBytes < 0) {
-        perror("ERR: cannot read from CAN...\n");
+        fprintf(stderr,"ERR: cannot read from CAN...\n");
         pthread_exit((void *)nBytes);
     }
 
@@ -242,35 +242,35 @@ int main(int argc, char *argv[]){
 
     int devmem = open("/dev/mem", O_RDWR | O_SYNC);
     if (devmem < 0)
-        perror("Error in opening /dev/mem\n");
+        fprintf(stderr,"Error in opening /dev/mem\n");
 
     mmapRet = mmap(0, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, devmem, CTRL_REG_ADDR);
     if(mmapRet == MAP_FAILED)
-        perror("Error in mapping CTRL_REG_ADDR\n");
+        fprintf(stderr,"Error in mapping CTRL_REG_ADDR\n");
     
     axiRegs.ctrlReg = (uint32_t*)mmapRet;
 
     mmapRet = mmap(0, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, devmem, STATUS_REG_ADDR);
     if(mmapRet == MAP_FAILED)
-        perror("Error in mapping STATUS_REG_ADDR\n");
+        fprintf(stderr,"Error in mapping STATUS_REG_ADDR\n");
 
     axiRegs.statusReg = (uint32_t*)mmapRet;
 
     mmapRet = mmap(0, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, devmem, L1CNT_REG_ADDR);
     if(mmapRet == MAP_FAILED)
-        perror("Error in mapping L1CNT_REG_ADDR\n");
+        fprintf(stderr,"Error in mapping L1CNT_REG_ADDR\n");
 
     axiRegs.l1CntReg = (uint32_t*)mmapRet;
 
     mmapRet = mmap(0, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, devmem, DMA_REG_ADDR);
     if(mmapRet == MAP_FAILED)
-        perror("Error in mapping DMA_REG_ADDR\n");
+        fprintf(stderr,"Error in mapping DMA_REG_ADDR\n");
 
     axiRegs.dmaReg = (uint32_t*)mmapRet;
 
     mmapRet = mmap(0, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, devmem, DATA_ADDR);
     if(mmapRet == MAP_FAILED)
-        perror("Error in mapping DATA_ADDR\n");
+        fprintf(stderr,"Error in mapping DATA_ADDR\n");
 
     fifoData = (uint32_t*)mmapRet;
 
@@ -289,7 +289,7 @@ int main(int argc, char *argv[]){
     while(tries < BIND_MAX_TRIES){
         err = bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
         if(err < 0){
-            perror("\tERR: Error in bind function: [%d]\nRetry %d...\n", err, tries);
+            fprintf(stderr,"\tERR: Error in bind function: [%d]\nRetry %d...\n", err, tries);
             tries++;
         }else{
             printf("Bind OK\n");
@@ -298,7 +298,7 @@ int main(int argc, char *argv[]){
     }
 
     if(tries >= BIND_MAX_TRIES){
-        perror("Cannot bind to socket, program must be restarted\n");
+        fprintf(stderr,"Cannot bind to socket, program must be restarted\n");
         return -1;
     }
 
@@ -307,7 +307,7 @@ int main(int argc, char *argv[]){
     while(tries < LISTEN_MAX_TRIES){
         err = listen(listenfd, CONN_MAX_QUEUE);
         if(err < 0){
-            perror("\tERR: Error in listen function: [%d]\nRetry %d...\n", err, tries);
+            fprintf(stderr,"\tERR: Error in listen function: [%d]\nRetry %d...\n", err, tries);
             tries++;
         }else{
             printf("Listen OK\n");
@@ -316,7 +316,7 @@ int main(int argc, char *argv[]){
     }
 
     if(tries >= LISTEN_MAX_TRIES){
-        perror("Cannot listen to socket, program must be restarted\n");
+        fprintf(stderr,"Cannot listen to socket, program must be restarted\n");
         return -1;
     }
 
@@ -331,7 +331,7 @@ int main(int argc, char *argv[]){
 
     canSocket = socket(PF_CAN, SOCK_RAW, CAN_RAW);
     if(canSocket < 0)
-        perror("\tERR: Cannot initialize CAN socket...\n");
+        fprintf(stderr,"\tERR: Cannot initialize CAN socket...\n");
 
     strcpy(ifr.ifr_name, "can0" );
     ioctl(canSocket, SIOCGIFINDEX, &ifr);
@@ -342,12 +342,12 @@ int main(int argc, char *argv[]){
 
     err = bind(canSocket, (struct sockaddr *)&canAddr, sizeof(canAddr));
     if (err < 0)
-        perror("\tERR: Cannot bind CAN socket...\n");
+        fprintf(stderr,"\tERR: Cannot bind CAN socket...\n");
 
     if(canSocket >= 0){
         err = pthread_create(&canRdrID, NULL, &canReaderThread, (void*)&canReaderArgs);
         if(err != 0){
-            perror("\tERR: Cannot create canReader thread...: [%s]\n", strerror(err));
+            fprintf(stderr,"\tERR: Cannot create canReader thread...: [%s]\n", strerror(err));
             close(canSocket);
         }
     }
@@ -359,7 +359,7 @@ int main(int argc, char *argv[]){
 
         connfd = accept(listenfd, (struct sockaddr*)NULL, NULL);
         if(connfd < 0){
-            perror("\tERR: Error in accept: [%s]\n", strerror(err));
+            fprintf(stderr,"\tERR: Error in accept: [%s]\n", strerror(err));
             continue;
         }
 
@@ -367,21 +367,21 @@ int main(int argc, char *argv[]){
 
         err = pthread_mutex_init(&mtx, NULL);
         if(err != 0){
-            perror("\nERR: Cannot init mutex, disconnecting...: [%s]\n", strerror(err));
+            fprintf(stderr,"\nERR: Cannot init mutex, disconnecting...: [%s]\n", strerror(err));
             close(connfd);
             continue;
         }
 
         err = pthread_create(&cmdDecID, NULL, &cmdDecodeThread, (void*)&cmdDecodeArg);
         if(err != 0){
-            perror("\tERR: Cannot create cmdDecode thread, disconnecting...: [%s]\n", strerror(err));
+            fprintf(stderr,"\tERR: Cannot create cmdDecode thread, disconnecting...: [%s]\n", strerror(err));
             close(connfd);
             continue;
         }
 
         err = pthread_create(&chkSttID, NULL, &checkFifoThread, (void*)&chkFifoArg);
         if(err != 0){
-            perror("\tERR: Cannot create checkFifo thread, disconnecting...: [%s]\n", strerror(err));
+            fprintf(stderr,"\tERR: Cannot create checkFifo thread, disconnecting...: [%s]\n", strerror(err));
             close(connfd);
             continue;
         }
