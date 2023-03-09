@@ -226,10 +226,10 @@ void* canReaderThread(void *arg){
 
         switch(dataIdx){
             case CAN_TIMESTAMP_ID:
-            timestamp = frame.data[1]       |
-                        frame.data[2] << 8  |
-                        frame.data[3] << 16 |
-                        frame.data[4] << 24;
+                timestamp = frame.data[1]       |
+                            frame.data[2] << 8  |
+                            frame.data[3] << 16 |
+                            frame.data[4] << 24;
                 break;
             case CAN_AX_ID:
             case CAN_AY_ID:
@@ -244,7 +244,7 @@ void* canReaderThread(void *arg){
         }
 
         if(dataIdx == CAN_GZ_ID)
-            printf("I = %d\n\tT = %d\n\t\tax = %d, ay = %d, az = %d\n\t\tgx = %d, gy = %d, gz = %d\n",dataIdx,timestamp,accel[0],accel[1],accel[2],gyro[0],gyro[1],gyro[2]);
+            printf("\tT = %d, Tf = %.2f\n\t\tax = %d, ay = %d, az = %d\n\t\tgx = %d, gy = %d, gz = %d\n",timestamp,timestamp*39e-6,accel[0],accel[1],accel[2],gyro[0],gyro[1],gyro[2]);
 
     }
 
