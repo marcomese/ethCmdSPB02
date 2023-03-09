@@ -209,8 +209,8 @@ void* canReaderThread(void *arg){
     canReaderArgs_t* canArg = (canReaderArgs_t*)arg;
     int nBytes = 0;
     struct can_frame frame;
-    int16_t accel[3] = {0,0,0};
-    int16_t gyro[3]  = {0,0,0};
+    uint16_t accel[3] = {0,0,0};
+    uint16_t gyro[3]  = {0,0,0};
     int8_t dataIdx = 0;
     uint32_t timestamp = 0;
 
