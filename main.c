@@ -361,7 +361,7 @@ int main(int argc, char *argv[]){
     rfilter.can_id   = 0x0B2;
     rfilter.can_mask = 0x0FF;
 
-    setsockopt(s, SOL_CAN_RAW, CAN_RAW_FILTER, &rfilter, sizeof(rfilter));
+    setsockopt(canSocket, SOL_CAN_RAW, CAN_RAW_FILTER, &rfilter, sizeof(rfilter));
 
     canReaderArgs.canSocket = canSocket;
     canReaderArgs.canData = &canData;
