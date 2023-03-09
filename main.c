@@ -75,8 +75,8 @@ typedef struct chkFifoArgs{
 typedef struct canReaderArgs{
     int canSocket;
     uint32_t* imuTimestamp;
-    float accel[3];
-    float gyro[3];
+    float* accel;
+    float* gyro;
 } canReaderArgs_t;
 
 typedef struct spb2Data{
