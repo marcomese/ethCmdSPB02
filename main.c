@@ -75,8 +75,8 @@ typedef struct chkFifoArgs{
 typedef struct canReaderArgs{
     int canSocket;
     uint32_t* imuTimestamp;
-    float* accel[3];
-    float* gyro[3];
+    float accel[3];
+    float gyro[3];
 } canReaderArgs_t;
 
 typedef struct spb2Data{
@@ -407,7 +407,6 @@ int main(int argc, char *argv[]){
     setsockopt(canSocket, SOL_CAN_RAW, CAN_RAW_FILTER, &rfilter, sizeof(rfilter));
 
     canReaderArgs.canSocket = canSocket;
-    canReaderArgs.canData = &canData;
     canReaderArgs.imuTimestamp = &imuTimestamp;
     canReaderArgs.accel = accel;
     canReaderArgs.gyro = gyro;
