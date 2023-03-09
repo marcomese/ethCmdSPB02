@@ -248,7 +248,7 @@ void* canReaderThread(void *arg){
 
         printf("\n");
 
-        printf("\tT = %d\n\t\tax = %d, ay = %d, az = %d\n\t\tgx = %d, gy = %d, gz = %d\n",timestamp,accel[0],accel[1],accel[2],gyro[0],gyro[1],gyro[2]);
+        printf("I = %d\n\tT = %d\n\t\tax = %d, ay = %d, az = %d\n\t\tgx = %d, gy = %d, gz = %d\n",dataIdx,timestamp,accel[0],accel[1],accel[2],gyro[0],gyro[1],gyro[2]);
 
     }
 
