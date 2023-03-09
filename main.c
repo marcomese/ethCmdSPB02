@@ -409,8 +409,8 @@ int main(int argc, char *argv[]){
     canReaderArgs.canSocket = canSocket;
     canReaderArgs.canData = &canData;
     canReaderArgs.imuTimestamp = &imuTimestamp;
-    canReaderArgs.accel = &accel;
-    canReaderArgs.gyro = &gyro;
+    canReaderArgs.accel = accel;
+    canReaderArgs.gyro = gyro;
 
     while (1)
     {
