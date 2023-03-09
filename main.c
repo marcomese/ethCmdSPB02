@@ -74,7 +74,9 @@ typedef struct chkFifoArgs{
 
 typedef struct canReaderArgs{
     int canSocket;
-    uint32_t* canData;
+    uint32_t* imuTimestamp;
+    float* accel[3];
+    float* gyro[3];
 } canReaderArgs_t;
 
 typedef struct spb2Data{
@@ -214,13 +216,8 @@ void* canReaderThread(void *arg){
     int8_t dataIdx = 0;
     uint32_t timestamp = 0;
 
-    while(1){
+    while(nBytes >= 0){
         nBytes = read(canArg->canSocket, &frame, sizeof(struct can_frame));
-
-        if(nBytes < 0){
-            fprintf(stderr,"ERR: cannot read from CAN...\n");
-            pthread_exit((void *)nBytes);
-        }
 
         dataIdx = frame.data[0];
 
@@ -243,11 +240,24 @@ void* canReaderThread(void *arg){
                 break;
         }
 
-        if(dataIdx == CAN_GZ_ID)
-            printf("\tT = %.2fs\n\t\tax = %d, ay = %d, az = %d\n\t\tgx = %d, gy = %d, gz = %d\n",timestamp*39e-6,accel[0],accel[1],accel[2],gyro[0],gyro[1],gyro[2]);
+        if(dataIdx == CAN_GZ_ID){
+            *canArg->imuTimestamp = (uint32_t)timestamp*39e-6;
+            *canArg->accel = accel;
+            *canArg->gyro = gyro;
+
+            printf("\tT = %ds\n\t\tax = %d, ay = %d, az = %d\n\t\tgx = %d, gy = %d, gz = %d\n",*canArg->imuTimestamp,
+                                                                                                *canArg->accel[0],
+                                                                                                *canArg->accel[1],
+                                                                                                *canArg->accel[2],
+                                                                                                *canArg->gyro[0],
+                                                                                                *canArg->gyro[1],
+                                                                                                *canArg->gyro[2]);
+        }
 
     }
 
+    fprintf(stderr,"ERR: cannot read from CAN...\n");
+    pthread_exit((void *)nBytes);
 }
 
 int main(int argc, char *argv[]){
@@ -275,6 +285,9 @@ int main(int argc, char *argv[]){
     struct ifreq ifr;
     struct sockaddr_can canAddr;
     struct can_filter rfilter;
+    uint32_t imuTimestamp = 0;
+    float accel[3] = {0.0,0.0,0.0};
+    float gyro[3] = {0.0,0.0,0.0};
 
     int devmem = open("/dev/mem", O_RDWR | O_SYNC);
     if (devmem < 0)
@@ -395,6 +408,9 @@ int main(int argc, char *argv[]){
 
     canReaderArgs.canSocket = canSocket;
     canReaderArgs.canData = &canData;
+    canReaderArgs.imuTimestamp = &imuTimestamp;
+    canReaderArgs.accel = &accel;
+    canReaderArgs.gyro = &gyro;
 
     while (1)
     {
