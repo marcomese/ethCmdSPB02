@@ -48,6 +48,14 @@
 
 #define RUN_STATUS_MASK 0x01
 
+#define CAN_TIMESTAMP_ID 19
+#define CAN_AX_ID 20
+#define CAN_AY_ID 21
+#define CAN_AZ_ID 22
+#define CAN_GX_ID 23
+#define CAN_GY_ID 24
+#define CAN_GZ_ID 25
+
 pthread_mutex_t mtx;
 
 typedef struct cmdDecodeArgs{
@@ -198,16 +206,41 @@ void* checkFifoThread(void *arg){
 }
 
 void* canReaderThread(void *arg){
+    canReaderArgs_t* canArg = (canReaderArgs_t*)arg;
     int nBytes = 0;
     struct can_frame frame;
-    canReaderArgs_t* canArg = (canReaderArgs_t*)arg;
+    int16_t accel[3] = {0,0,0};
+    int16_t gyro[3]  = {0,0,0};
+    int8_t dataIdx = 0;
+    uint32_t timestamp = 0;
 
     while(1){
         nBytes = read(canArg->canSocket, &frame, sizeof(struct can_frame));
 
-        if(nBytes < 0) {
+        if(nBytes < 0){
             fprintf(stderr,"ERR: cannot read from CAN...\n");
             pthread_exit((void *)nBytes);
+        }
+
+        switch(dataIdx){
+            case CAN_TIMESTAMP_ID:
+            timestamp = frame.data[1]       |
+                        frame.data[2] << 8  |
+                        frame.data[3] << 16 |
+                        frame.data[4] << 24;
+                break;
+            case CAN_AX_ID:
+            case CAN_AY_ID:
+            case CAN_AZ_ID:
+                accel[dataIdx-CAN_AX_ID] = frame.data[1] | frame.data[2] << 8;
+                break;
+            case CAN_GX_ID:
+            case CAN_GY_ID:
+            case CAN_GZ_ID:
+                gyro[dataIdx-CAN_GX_ID] = frame.data[1] | frame.data[2] << 8;
+                break;
+            default:
+                continue;
         }
 
         printf("0x%03X [%d] ",frame.can_id, frame.can_dlc);
@@ -216,6 +249,9 @@ void* canReaderThread(void *arg){
             printf("%02X ",frame.data[i]);
 
         printf("\n");
+
+        printf("\tT = %d\n\t\tax = %d, ay = %d, az = %d\n\t\tgx = %d, gy = %d, gz = %d\n",timestamp,accel[0],accel[1],accel[2],gyro[0],gyro[1],gyro[2]);
+
     }
 
 }
