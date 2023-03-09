@@ -75,8 +75,8 @@ typedef struct chkFifoArgs{
 typedef struct canReaderArgs{
     int canSocket;
     uint32_t* imuTimestamp;
-    float* accel;
-    float* gyro;
+    int16_t accel[3];
+    int16_t gyro[3];
 } canReaderArgs_t;
 
 typedef struct spb2Data{
@@ -242,8 +242,8 @@ void* canReaderThread(void *arg){
 
         if(dataIdx == CAN_GZ_ID){
             *canArg->imuTimestamp = (uint32_t)timestamp*39e-6;
-            memcpy(canArg->accel,(float*)accel,3*sizeof(float));
-            memcpy(canArg->gyro,(float*)gyro,3*sizeof(float));
+            memcpy(canArg->accel,accel,sizeof(accel));
+            memcpy(canArg->gyro,gyro,sizeof(gyro));
 
             printf("\tT = %ds\n\t\tax = %.2f, ay = %.2f, az = %.2f\n\t\tgx = %.2f, gy = %.2f, gz = %.2f\n",*canArg->imuTimestamp,
                                                                                                 canArg->accel[0],
@@ -286,8 +286,8 @@ int main(int argc, char *argv[]){
     struct sockaddr_can canAddr;
     struct can_filter rfilter;
     uint32_t imuTimestamp = 0;
-    float accel[3] = {0.0,0.0,0.0};
-    float gyro[3] = {0.0,0.0,0.0};
+    int16_t accel[3] = {0,0,0};
+    int16_t gyro[3] = {0,0,0};
 
     int devmem = open("/dev/mem", O_RDWR | O_SYNC);
     if (devmem < 0)
