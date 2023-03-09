@@ -244,6 +244,7 @@ int main(int argc, char *argv[]){
     int canSocket = 0;
     struct ifreq ifr;
     struct sockaddr_can canAddr;
+    struct can_filter rfilter;
 
     int devmem = open("/dev/mem", O_RDWR | O_SYNC);
     if (devmem < 0)
@@ -356,6 +357,11 @@ int main(int argc, char *argv[]){
             close(canSocket);
         }
     }
+
+    rfilter.can_id   = 0x0B2;
+    rfilter.can_mask = 0x0FF;
+
+    setsockopt(s, SOL_CAN_RAW, CAN_RAW_FILTER, &rfilter, sizeof(rfilter));
 
     canReaderArgs.canSocket = canSocket;
     canReaderArgs.canData = &canData;
