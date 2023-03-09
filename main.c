@@ -205,7 +205,7 @@ void* canReaderThread(void *arg){
     nBytes = read(canArg->canSocket, &frame, sizeof(struct can_frame));
 
     if(nBytes < 0) {
-        fprintf(stderr,"ERR: cannot read from CAN...\n");
+        printf("ERR: cannot read from CAN...\n");
         pthread_exit((void *)nBytes);
     }
 
