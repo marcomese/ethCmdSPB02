@@ -240,6 +240,7 @@ int main(int argc, char *argv[]){
     uint32_t cmdDecRetVal = 0;
     uint32_t chkSttRetVal = 0;
     uint32_t canRdrRetVal = 0;
+    uint32_t canData = 0;
     uint32_t cmdID = NONE;
     int socketStatus = 1;
     int err = -1;
@@ -360,6 +361,9 @@ int main(int argc, char *argv[]){
             close(canSocket);
         }
     }
+
+    canReaderArgs.canSocket = canSocket;
+    canReaderArgs.canData = &canData;
 
     printf("All ready!\n");
 
