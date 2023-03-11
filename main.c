@@ -263,12 +263,12 @@ void* canReaderThread(void *arg){
             }
 
             printf("\tT = %ds\n\t\tax = %.2f, ay = %.2f, az = %.2f\n\t\tgx = %.2f, gy = %.2f, gz = %.2f\n",*canArg->imuTimestamp,
-                                                                                                            accelF[0],
-                                                                                                            accelF[1],
-                                                                                                            accelF[2],
-                                                                                                            gyroF[0],
-                                                                                                            gyroF[1],
-                                                                                                            gyroF[2]);
+                                                                                                            accelN[0],
+                                                                                                            accelN[1],
+                                                                                                            accelN[2],
+                                                                                                            gyroN[0],
+                                                                                                            gyroN[1],
+                                                                                                            gyroN[2]);
         }
 
     }
