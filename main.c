@@ -56,6 +56,9 @@
 #define CAN_GY_ID 24
 #define CAN_GZ_ID 25
 
+#define ACCEL_SCALE 2.0/32767.0
+#define GYRO_SCALE 2000.0/32767.0
+
 pthread_mutex_t mtx;
 
 typedef struct cmdDecodeArgs{
@@ -212,7 +215,11 @@ void* canReaderThread(void *arg){
     int nBytes = 0;
     struct can_frame frame;
     int16_t accel[3] = {0,0,0};
+    float accelF[3] = {0.0,0.0,0.0};
+    float accelN[3] = {0.0,0.0,0.0};
     int16_t gyro[3]  = {0,0,0};
+    float gyroF[3] = {0.0,0.0,0.0};
+    float gyroN[3] = {0.0,0.0,0.0};
     int8_t dataIdx = 0;
     uint32_t timestamp = 0;
 
@@ -245,18 +252,27 @@ void* canReaderThread(void *arg){
             memcpy(canArg->accel,accel,sizeof(accel));
             memcpy(canArg->gyro,gyro,sizeof(gyro));
 
-            printf("\tT = %ds\n\t\tax = %d, ay = %d, az = %d\n\t\tgx = %d, gy = %d, gz = %d\n",*canArg->imuTimestamp,
-                                                                                                canArg->accel[0],
-                                                                                                canArg->accel[1],
-                                                                                                canArg->accel[2],
-                                                                                                canArg->gyro[0],
-                                                                                                canArg->gyro[1],
-                                                                                                canArg->gyro[2]);
+            for(int i = 0; i < 3; i++){
+                accelF[i] = accel[i]*ACCEL_SCALE;
+                gyroF[i] = gyro[i]*GYRO_SCALE;
+
+                accelN[i] = accelF[i]/sqrt(pow(accelF[0],2)+pow(accelF[1],2)+pow(accelF[3],2));
+                gyroN[i] = gyroF[i]/sqrt(pow(gyroF[0],2)+pow(gyroF[1],2)+pow(gyroF[3],2));
+
+            }
+
+            printf("\tT = %ds\n\t\tax = %.2f, ay = %.2f, az = %.2f\n\t\tgx = %.2f, gy = %.2f, gz = %.2f\n",*canArg->imuTimestamp,
+                                                                                                            accelN[0],
+                                                                                                            accelN[1],
+                                                                                                            accelN[2],
+                                                                                                            gyroN[0],
+                                                                                                            gyroN[1],
+                                                                                                            gyroN[2]);
         }
 
     }
 
-    fprintf(stderr,"ERR: cannot read from CAN...\n");
+    fprintf(stderr,"ERR: error reading from CAN...\n");
     pthread_exit((void *)nBytes);
 }
 
