@@ -267,11 +267,14 @@ void* canReaderThread(void *arg){
 
             printf("\tT = %ds\n"
                    "\t\taxR = %d, ayR = %d, azR = %d\n"
-                   "\t\taxN = %.3f, ayN = %.3f, azN = %.3f\n\t\tgx = %.2f, gy = %.2f, gz = %.2f\n",
+                   "\t\taxN = %.3f, ayN = %.3f, azN = %.3f\n"
+                   "\t\tgx = %.2f, gy = %.2f, gz = %.2f\n"
+                   "\t\tgxR = %d, gyR = %d, gzR = %d\n",
                    *canArg->imuTimestamp,
                    canArg->rawAccel[0],canArg->rawAccel[1],canArg->rawAccel[2],
                    canArg->accel[0],canArg->accel[1],canArg->accel[2],
-                   canArg->gyro[0],canArg->gyro[1],canArg->gyro[2]);
+                   canArg->gyro[0],canArg->gyro[1],canArg->gyro[2],
+                   canArg->rawGyro[0],canArg->rawGyro[1],canArg->rawGyro[2]);
         }
     }
     fprintf(stderr,"ERR: error reading from CAN...\n");
