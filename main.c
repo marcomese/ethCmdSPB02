@@ -17,6 +17,7 @@
 #include <pthread.h>
 #include <time.h>
 #include <endian.h>
+#include <math.h>
 #include "commands.h"
 #include "registers.h"
 #include "dma.h"
