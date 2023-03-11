@@ -231,6 +231,8 @@ void* canReaderThread(void *arg){
 
         dataIdx = frame.data[0];
 
+        printf("dataIdx=%d",dataIdx);
+
         switch(dataIdx){
             case CAN_TIMESTAMP_ID:
                 timestamp = frame.data[1]       |
