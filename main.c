@@ -251,10 +251,6 @@ void* canReaderThread(void *arg){
         }
 
         if(dataIdx == CAN_GZ_ID){
-            *canArg->imuTimestamp = (uint32_t)timestamp*IMU_TIMESTAMP_UNIT;
-            memcpy(canArg->rawAccel,accel,sizeof(accel));
-            memcpy(canArg->rawGyro,gyro,sizeof(gyro));
-
             for(int i = 0; i < 3; i++){
                 accelF[i] = accel[i]*ACCEL_SCALE;
                 gyroF[i] = gyro[i]*GYRO_SCALE;
@@ -262,8 +258,13 @@ void* canReaderThread(void *arg){
                 accelN[i] = accelF[i]/sqrt(pow(accelF[0],2)+pow(accelF[1],2)+pow(accelF[2],2));
             }
 
+            pthread_mutex_lock(&mtx);
+            *canArg->imuTimestamp = (uint32_t)timestamp*IMU_TIMESTAMP_UNIT;
+            memcpy(canArg->rawAccel,accel,sizeof(accel));
+            memcpy(canArg->rawGyro,gyro,sizeof(gyro));
             memcpy(canArg->accel,accelN,sizeof(accelN));
             memcpy(canArg->gyro,gyroF,sizeof(gyroF));
+            pthread_mutex_lock(&mtx);
 
             printf("\tT = %ds\n"
                    "\t\taxR = %d, ayR = %d, azR = %d\n"
