@@ -79,8 +79,8 @@ typedef struct chkFifoArgs{
 typedef struct canReaderArgs{
     int canSocket;
     uint32_t* imuTimestamp;
-    int16_t* accel;
-    int16_t* gyro;
+    float* accel;
+    float* gyro;
 } canReaderArgs_t;
 
 typedef struct spb2Data{
@@ -215,13 +215,13 @@ void* canReaderThread(void *arg){
     canReaderArgs_t* canArg = (canReaderArgs_t*)arg;
     int nBytes = 0;
     struct can_frame frame;
-    int16_t accel[3] = {0,0,0};
-    float accelF[3] = {0.0,0.0,0.0};
-    float accelN[3] = {0.0,0.0,0.0};
-    int16_t gyro[3]  = {0,0,0};
-    float gyroF[3] = {0.0,0.0,0.0};
-    int8_t dataIdx = 0;
+    uint8_t dataIdx = 0;
     uint32_t timestamp = 0;
+    int16_t accel[3]  = {0,0,0};
+    float   accelF[3] = {0.0,0.0,0.0};
+    float   accelN[3] = {0.0,0.0,0.0};
+    int16_t gyro[3]   = {0,0,0};
+    float   gyroF[3]  = {0.0,0.0,0.0};
 
     while(nBytes >= 0){
         nBytes = read(canArg->canSocket, &frame, sizeof(struct can_frame));
@@ -249,8 +249,8 @@ void* canReaderThread(void *arg){
 
         if(dataIdx == CAN_GZ_ID){
             *canArg->imuTimestamp = (uint32_t)timestamp*39e-6;
-            memcpy(canArg->accel,accel,sizeof(accel));
-            memcpy(canArg->gyro,gyro,sizeof(gyro));
+            memcpy(canArg->accel,accelN,sizeof(accelN));
+            memcpy(canArg->gyro,gyroF,sizeof(gyroF));
 
             for(int i = 0; i < 3; i++){
                 accelF[i] = accel[i]*ACCEL_SCALE;
@@ -260,12 +260,12 @@ void* canReaderThread(void *arg){
             }
 
             printf("\tT = %ds\n\t\tax = %.2f, ay = %.2f, az = %.2f\n\t\tgx = %.2f, gy = %.2f, gz = %.2f\n",*canArg->imuTimestamp,
-                                                                                                            accelN[0],
-                                                                                                            accelN[1],
-                                                                                                            accelN[2],
-                                                                                                            gyroF[0],
-                                                                                                            gyroF[1],
-                                                                                                            gyroF[2]);
+                                                                                                            canArg->accel[0],
+                                                                                                            canArg->accel[1],
+                                                                                                            canArg->accel[2],
+                                                                                                            canArg->gyro[0],
+                                                                                                            canArg->gyro[1],
+                                                                                                            canArg->gyro[2]);
         }
 
     }
@@ -300,8 +300,8 @@ int main(int argc, char *argv[]){
     struct sockaddr_can canAddr;
     struct can_filter rfilter;
     uint32_t imuTimestamp = 0;
-    int16_t accel[3] = {0,0,0};
-    int16_t gyro[3] = {0,0,0};
+    float accel[3] = {0.0,0.0,0.0};
+    float gyro[3] = {0.0,0.0,0.0};
 
     int devmem = open("/dev/mem", O_RDWR | O_SYNC);
     if (devmem < 0)
