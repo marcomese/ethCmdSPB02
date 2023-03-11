@@ -305,7 +305,7 @@ int main(int argc, char *argv[]){
     struct can_filter rfilter;
     uint32_t imuTimestamp = 0;
     int16_t rawAccel[3] = {0,0,0};
-    int16_t rawGyro[3]  = {0,0,0}:
+    int16_t rawGyro[3]  = {0,0,0};
     float   accel[3]    = {0.0,0.0,0.0};
     float   gyro[3]     = {0.0,0.0,0.0};
 
