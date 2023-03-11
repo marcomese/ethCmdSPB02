@@ -59,28 +59,31 @@
 
 #define ACCEL_SCALE 2.0/32767.0
 #define GYRO_SCALE 2000.0/32767.0
+#define IMU_TIMESTAMP_UNIT 39e-6
 
 pthread_mutex_t mtx;
 
 typedef struct cmdDecodeArgs{
     axiRegisters_t* regs;
-    uint32_t* cmdID;
-    int connfd;
-    int* socketStatus;
+    uint32_t*       cmdID;
+    int             connfd;
+    int*            socketStatus;
 } cmdDecodeArgs_t;
 
 typedef struct chkFifoArgs{
     axiRegisters_t* regs;
-    uint32_t* cmdID;
-    int* socketStatus;
-    uint32_t* fifoData;
+    uint32_t*       cmdID;
+    int*            socketStatus;
+    uint32_t*       fifoData;
 } chkFifoArgs_t;
 
 typedef struct canReaderArgs{
-    int canSocket;
+    int       canSocket;
     uint32_t* imuTimestamp;
-    float* accel;
-    float* gyro;
+    int16_t*  rawAccel;
+    int16_t*  rawGyro;
+    float*    accel;
+    float*    gyro;
 } canReaderArgs_t;
 
 typedef struct spb2Data{
@@ -213,15 +216,15 @@ void* checkFifoThread(void *arg){
 
 void* canReaderThread(void *arg){
     canReaderArgs_t* canArg = (canReaderArgs_t*)arg;
-    int nBytes = 0;
     struct can_frame frame;
-    uint8_t dataIdx = 0;
+    int      nBytes    = 0;
+    uint8_t  dataIdx   = 0;
     uint32_t timestamp = 0;
-    int16_t accel[3]  = {0,0,0};
-    float   accelF[3] = {0.0,0.0,0.0};
-    float   accelN[3] = {0.0,0.0,0.0};
-    int16_t gyro[3]   = {0,0,0};
-    float   gyroF[3]  = {0.0,0.0,0.0};
+    int16_t  accel[3]  = {0,0,0};
+    float    accelF[3] = {0.0,0.0,0.0};
+    float    accelN[3] = {0.0,0.0,0.0};
+    int16_t  gyro[3]   = {0,0,0};
+    float    gyroF[3]  = {0.0,0.0,0.0};
 
     while(nBytes >= 0){
         nBytes = read(canArg->canSocket, &frame, sizeof(struct can_frame));
@@ -248,9 +251,9 @@ void* canReaderThread(void *arg){
         }
 
         if(dataIdx == CAN_GZ_ID){
-            *canArg->imuTimestamp = (uint32_t)timestamp*39e-6;
-            memcpy(canArg->accel,accelN,sizeof(accelN));
-            memcpy(canArg->gyro,gyroF,sizeof(gyroF));
+            *canArg->imuTimestamp = (uint32_t)timestamp*IMU_TIMESTAMP_UNIT;
+            memcpy(canArg->rawAccel,accel,sizeof(accel));
+            memcpy(canArg->rawGyro,gyro,sizeof(gyro));
 
             for(int i = 0; i < 3; i++){
                 accelF[i] = accel[i]*ACCEL_SCALE;
@@ -259,17 +262,18 @@ void* canReaderThread(void *arg){
                 accelN[i] = accelF[i]/sqrt(pow(accelF[0],2)+pow(accelF[1],2)+pow(accelF[2],2));
             }
 
-            printf("\tT = %ds\n\t\tax = %.2f, ay = %.2f, az = %.2f\n\t\tgx = %.2f, gy = %.2f, gz = %.2f\n",*canArg->imuTimestamp,
-                                                                                                            canArg->accel[0],
-                                                                                                            canArg->accel[1],
-                                                                                                            canArg->accel[2],
-                                                                                                            canArg->gyro[0],
-                                                                                                            canArg->gyro[1],
-                                                                                                            canArg->gyro[2]);
+            memcpy(canArg->accel,accelN,sizeof(accelN));
+            memcpy(canArg->gyro,gyroF,sizeof(gyroF));
+
+            printf("\tT = %ds\n"
+                   "\t\taxR = %d, ayR = %d, azR = %d\n"
+                   "\t\taxN = %.3f, ayN = %.3f, azN = %.3f\n\t\tgx = %.2f, gy = %.2f, gz = %.2f\n",
+                   *canArg->imuTimestamp,
+                   canArg->rawAccel[0],canArg->rawAccel[1],canArg->rawAccel[2],
+                   canArg->accel[0],canArg->accel[1],canArg->accel[2],
+                   canArg->gyro[0],canArg->gyro[1],canArg->gyro[2]);
         }
-
     }
-
     fprintf(stderr,"ERR: error reading from CAN...\n");
     pthread_exit((void *)nBytes);
 }
@@ -300,8 +304,10 @@ int main(int argc, char *argv[]){
     struct sockaddr_can canAddr;
     struct can_filter rfilter;
     uint32_t imuTimestamp = 0;
-    float accel[3] = {0.0,0.0,0.0};
-    float gyro[3] = {0.0,0.0,0.0};
+    int16_t rawAccel[3] = {0,0,0};
+    int16_t rawGyro[3]  = {0,0,0}:
+    float   accel[3]    = {0.0,0.0,0.0};
+    float   gyro[3]     = {0.0,0.0,0.0};
 
     int devmem = open("/dev/mem", O_RDWR | O_SYNC);
     if (devmem < 0)
@@ -420,10 +426,12 @@ int main(int argc, char *argv[]){
 
     setsockopt(canSocket, SOL_CAN_RAW, CAN_RAW_FILTER, &rfilter, sizeof(rfilter));
 
-    canReaderArgs.canSocket = canSocket;
+    canReaderArgs.canSocket    = canSocket;
     canReaderArgs.imuTimestamp = &imuTimestamp;
-    canReaderArgs.accel = accel;
-    canReaderArgs.gyro = gyro;
+    canReaderArgs.rawAccel     = rawAccel;
+    canReaderArgs.rawGyro      = rawGyro;
+    canReaderArgs.accel        = accel;
+    canReaderArgs.gyro         = gyro;
 
     while (1)
     {
