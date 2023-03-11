@@ -258,13 +258,17 @@ void* canReaderThread(void *arg){
                 accelN[i] = accelF[i]/sqrt(pow(accelF[0],2)+pow(accelF[1],2)+pow(accelF[2],2));
             }
 
+            printf("debug mutex 0");
             pthread_mutex_lock(&mtx);
+            printf("debug mutex 1");
             *canArg->imuTimestamp = (uint32_t)timestamp*IMU_TIMESTAMP_UNIT;
             memcpy(canArg->rawAccel,accel,sizeof(accel));
             memcpy(canArg->rawGyro,gyro,sizeof(gyro));
             memcpy(canArg->accel,accelN,sizeof(accelN));
             memcpy(canArg->gyro,gyroF,sizeof(gyroF));
+            printf("debug mutex 2");
             pthread_mutex_lock(&mtx);
+            printf("debug mutex 3");
 
             printf("\tT = %ds\n"
                    "\t\taxR = %d, ayR = %d, azR = %d\n"
