@@ -1,7 +1,7 @@
 CC = gcc
 DEPS = commands.h registers.h dma.h crc32.h
 OBJ = main.o commands.o registers.o dma.o crc32.o
-LIBS = -lpthread
+LIBS = -lpthread -lm
 DBG = 0
 
 %.o: %.c $(DEPS)
