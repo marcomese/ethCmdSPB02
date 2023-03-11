@@ -220,7 +220,6 @@ void* canReaderThread(void *arg){
     float accelN[3] = {0.0,0.0,0.0};
     int16_t gyro[3]  = {0,0,0};
     float gyroF[3] = {0.0,0.0,0.0};
-    float gyroN[3] = {0.0,0.0,0.0};
     int8_t dataIdx = 0;
     uint32_t timestamp = 0;
 
@@ -258,17 +257,15 @@ void* canReaderThread(void *arg){
                 gyroF[i] = gyro[i]*GYRO_SCALE;
 
                 accelN[i] = accelF[i]/sqrt(pow(accelF[0],2)+pow(accelF[1],2)+pow(accelF[2],2));
-                gyroN[i] = gyroF[i]/sqrt(pow(gyroF[0],2)+pow(gyroF[1],2)+pow(gyroF[2],2));
-
             }
 
             printf("\tT = %ds\n\t\tax = %.2f, ay = %.2f, az = %.2f\n\t\tgx = %.2f, gy = %.2f, gz = %.2f\n",*canArg->imuTimestamp,
                                                                                                             accelN[0],
                                                                                                             accelN[1],
                                                                                                             accelN[2],
-                                                                                                            gyroN[0],
-                                                                                                            gyroN[1],
-                                                                                                            gyroN[2]);
+                                                                                                            gyroF[0],
+                                                                                                            gyroF[1],
+                                                                                                            gyroF[2]);
         }
 
     }
