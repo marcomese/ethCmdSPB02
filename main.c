@@ -156,6 +156,7 @@ void* checkFifoThread(void *arg){
     uint32_t cmdIDLocal = NONE;
     uint32_t eventCounter = 0;
     uint32_t fileCounter = 0;
+    uint32_t imuTimestamp = 0;
     char fileName[FILENAME_LEN] = "";
     spb2Data_t data = {0, 0, 0, 0, 0, 0, 0, 0, "", 0};
 
@@ -165,6 +166,7 @@ void* checkFifoThread(void *arg){
         pthread_mutex_lock(&mtx);
         socketStatusLocal = *chkArg->socketStatus;
         cmdIDLocal = *chkArg->cmdID;
+        imuTimestamp = *chkArg->imuTimestamp;
         pthread_mutex_unlock(&mtx);
 
         exitCondition = (socketStatusLocal <= 0) || (cmdIDLocal == EXIT);
@@ -187,7 +189,7 @@ void* checkFifoThread(void *arg){
             data.unixTime  = (uint32_t)time(NULL);
             data.trgCount  = *(chkArg->fifoData+TRGCNT_IDX);
             data.gtuCount  = *(chkArg->fifoData+GTUCNT_IDX);
-            data.trgFlag   = *(chkArg->fifoData+TRGFLG_IDX) | (*chkArg->imuTimestamp << 8);
+            data.trgFlag   = *(chkArg->fifoData+TRGFLG_IDX) | (imuTimestamp << 8);
             data.aliveTime = *(chkArg->fifoData+ALIVET_IDX);
             data.deadTime  = *(chkArg->fifoData+DEADT_IDX);
             data.status    = statusReg;
