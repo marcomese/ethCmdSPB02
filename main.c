@@ -75,6 +75,7 @@ typedef struct chkFifoArgs{
     uint32_t*       cmdID;
     int*            socketStatus;
     uint32_t*       fifoData;
+    uint32_t*       imuTimestamp;
 } chkFifoArgs_t;
 
 typedef struct canReaderArgs{
@@ -187,10 +188,12 @@ void* checkFifoThread(void *arg){
             data.unixTime  = (uint32_t)time(NULL);
             data.trgCount  = *(chkArg->fifoData+TRGCNT_IDX);
             data.gtuCount  = *(chkArg->fifoData+GTUCNT_IDX);
-            data.trgFlag   = *(chkArg->fifoData+TRGFLG_IDX);
+            data.trgFlag   = *(chkArg->fifoData+TRGFLG_IDX) | (*chkArg->imuTimestamp << 8);
             data.aliveTime = *(chkArg->fifoData+ALIVET_IDX);
             data.deadTime  = *(chkArg->fifoData+DEADT_IDX);
             data.status    = statusReg;
+
+            print("0x%08x",data.trgFlag);
 
             for(int i = DATA_NUMERICS; i < DATA_WORDS; i++){
                 data.gpsStr[((i-DATA_NUMERICS)*4)]     = (char)(*(chkArg->fifoData+i)  & 0x000000FF);
@@ -265,7 +268,6 @@ void* canReaderThread(void *arg){
             memcpy(canArg->accel,accelN,sizeof(accelN));
             memcpy(canArg->gyro,gyroF,sizeof(gyroF));
             pthread_mutex_unlock(&mtx);
-
 
             printf("\tT = %ds\n"
                    "\t\taxR = %d, ayR = %d, azR = %d\n"
@@ -402,6 +404,7 @@ int main(int argc, char *argv[]){
     chkFifoArg.cmdID = &cmdID;
     chkFifoArg.socketStatus = &socketStatus;
     chkFifoArg.fifoData = fifoData;
+    chkFifoArg.imuTimestamp = &imuTimestamp;
 
     canSocket = socket(PF_CAN, SOCK_RAW, CAN_RAW);
     if(canSocket < 0)
