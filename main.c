@@ -173,6 +173,8 @@ void* checkFifoThread(void *arg){
 
         statusReg = *(chkArg->regs->statusReg);
 
+        printf("statusReg = 0x%08x",statusReg);
+
         running = statusReg & RUN_STATUS_MASK;
 
         memset(data.gpsStr, '\0', DATA_GPS_BYTES);
