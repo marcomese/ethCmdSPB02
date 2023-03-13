@@ -59,7 +59,6 @@
 
 #define ACCEL_SCALE 2.0/32767.0
 #define GYRO_SCALE 2000.0/32767.0
-#define IMU_TIMESTAMP_UNIT 39e-6
 
 pthread_mutex_t mtx;
 
@@ -262,14 +261,14 @@ void* canReaderThread(void *arg){
             }
 
             pthread_mutex_lock(&mtx);
-            *canArg->imuTimestamp = (uint32_t)timestamp*IMU_TIMESTAMP_UNIT;
+            *canArg->imuTimestamp = timestamp;
             memcpy(canArg->rawAccel,accel,sizeof(accel));
             memcpy(canArg->rawGyro,gyro,sizeof(gyro));
             memcpy(canArg->accel,accelN,sizeof(accelN));
             memcpy(canArg->gyro,gyroF,sizeof(gyroF));
             pthread_mutex_unlock(&mtx);
 
-            printf("\tT = %ds\n"
+            printf("\tT = %08x\n"
                    "\t\taxR = %d, ayR = %d, azR = %d\n"
                    "\t\taxN = %.3f, ayN = %.3f, azN = %.3f\n"
                    "\t\tgx = %.2f, gy = %.2f, gz = %.2f\n"
