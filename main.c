@@ -165,10 +165,12 @@ void* checkFifoThread(void *arg){
         dma_transfer_s2mm(chkArg->regs->dmaReg, DATA_BYTES, chkArg->socketStatus, chkArg->cmdID, chkArg->regs->statusReg, &mtx);
 
         pthread_mutex_lock(&mtx);
+        printf("mutex locked");
         socketStatusLocal = *chkArg->socketStatus;
         cmdIDLocal = *chkArg->cmdID;
         imuTimestamp = *chkArg->imuTimestamp;
         pthread_mutex_unlock(&mtx);
+        printf("mutex unlocked");
 
         exitCondition = (socketStatusLocal <= 0) || (cmdIDLocal == EXIT);
 
