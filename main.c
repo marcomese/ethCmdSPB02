@@ -193,7 +193,7 @@ void* checkFifoThread(void *arg){
             data.deadTime  = *(chkArg->fifoData+DEADT_IDX);
             data.status    = statusReg;
 
-            print("0x%08x",data.trgFlag);
+            printf("0x%08x",data.trgFlag);
 
             for(int i = DATA_NUMERICS; i < DATA_WORDS; i++){
                 data.gpsStr[((i-DATA_NUMERICS)*4)]     = (char)(*(chkArg->fifoData+i)  & 0x000000FF);
