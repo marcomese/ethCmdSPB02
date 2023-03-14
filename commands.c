@@ -102,6 +102,8 @@ static void readCmd(axiRegisters_t *regDev, int connfd, cmd_t *c){
     char resStr[TCP_SND_BUF] = "";
     uint32_t* reg;
     
+    printf("cmdVal = %s",c->cmdVal);
+
     switch(c->cmdVal){
         case READ_STATUS:
             reg = regDev->statusReg;
