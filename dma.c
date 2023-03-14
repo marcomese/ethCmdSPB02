@@ -19,14 +19,18 @@ int dma_s2mm_sync(unsigned int *virtual_addr, int* socketStatus, uint32_t* cmdID
     while ((!(s2mm_status & IOC_IRQ_FLAG) || !(s2mm_status & IDLE_FLAG)) && !exitCondition){
         s2mm_status = read_dma(virtual_addr, S2MM_STATUS_REGISTER);
 
-        printf("cmdID0 = %d\n",*cmdID);
+        if(*cmdID != 6)
+            printf("cmdID0 = %d\n",*cmdID);
 
         pthread_mutex_lock(mtx);
-        printf("cmdID1 = %d\n",*cmdID);
+        if(*cmdID != 6)
+            printf("cmdID1 = %d\n",*cmdID);
         exitCondition = (*socketStatus <= 0) || (*cmdID == EXIT) || (((*running) & 1) == 0);
-        printf("cmdID2 = %d\n",*cmdID);
+        if(*cmdID != 6)
+            printf("cmdID2 = %d\n",*cmdID);
         pthread_mutex_unlock(mtx);
-        printf("cmdID3 = %d\n",*cmdID);
+        if(*cmdID != 6)
+            printf("cmdID3 = %d\n",*cmdID);
     }
 
     return 0;
