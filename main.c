@@ -115,6 +115,8 @@ void* cmdDecodeThread(void *arg){
             *cmdArg->cmdID = decodeCmdStr(cmdArg->regs, cmdArg->connfd, ethStr);
         else
             pthread_exit(NULL);
+        
+        ethStr = "";
     }
 
     pthread_exit((void *)cmdArg->cmdID);
