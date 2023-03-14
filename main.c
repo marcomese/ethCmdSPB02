@@ -211,7 +211,7 @@ void* monitorThread(void* arg){
             oldStatusReg = newStatusReg;
             printf("status = 0x%08x\n"
                    "ctrlReg = 0x%08x\n"
-                   "cmdID = %d",
+                   "cmdID = %d\n",
                    newStatusReg,
                    *(monitorArg->regs->ctrlReg),
                    *(monitorArg->cmdID));
