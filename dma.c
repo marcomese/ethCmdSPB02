@@ -13,17 +13,11 @@ unsigned int read_dma(unsigned int *virtual_addr, int offset){
 int dma_s2mm_sync(unsigned int *virtual_addr, int* socketStatus, uint32_t* cmdID, uint32_t* running, pthread_mutex_t* mtx){
     unsigned int s2mm_status = read_dma(virtual_addr, S2MM_STATUS_REGISTER);
     unsigned int exitCondition = 0;
-    uint8_t busyVal = 0;
 
     // sit in this while loop as long as the status does not read back 0x00001002 (4098)
     // 0x00001002 = IOC interrupt has occured and DMA is idle
     while ((!(s2mm_status & IOC_IRQ_FLAG) || !(s2mm_status & IDLE_FLAG)) && !exitCondition){
         s2mm_status = read_dma(virtual_addr, S2MM_STATUS_REGISTER);
-
-        busyVal = ((*running) & (1<<7))>>7;
-
-        if(busyVal == 1)
-            printf("status = 0x%08x, cmdID = %d\n",*running,*cmdID);
 
         pthread_mutex_lock(mtx);
         exitCondition = (*socketStatus <= 0) || (*cmdID == EXIT) || (((*running) & 1) == 0);
