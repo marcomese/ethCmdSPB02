@@ -23,7 +23,7 @@ int dma_s2mm_sync(unsigned int *virtual_addr, int* socketStatus, uint32_t* cmdID
         busyVal = ((*running) & (1<<7))>>7;
 
         if(busyVal == 1)
-            printf("status = %d, cmdID = %d\n",*running,*cmdID);
+            printf("status = 0x%08x, cmdID = %d\n",*running,*cmdID);
 
         pthread_mutex_lock(mtx);
         exitCondition = (*socketStatus <= 0) || (*cmdID == EXIT) || (((*running) & 1) == 0);
