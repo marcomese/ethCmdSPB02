@@ -116,6 +116,8 @@ void* cmdDecodeThread(void *arg){
         else
             pthread_exit(NULL);
         
+        printf("cmdID = %d",*cmdArg->cmdID);
+
         strncpy(ethStr,"",CMD_MAX_LEN);
     }
 

@@ -196,8 +196,6 @@ uint32_t decodeCmdStr(axiRegisters_t* regDev, int connfd, char *ethStr){
         if (i < CMD_MAX_LEN)
             cmdStr[i] = ethStr[i];
 
-    printf("cmdStr = %s, ethStr = %s\n",cmdStr,ethStr);
-
     cmd_t *cmd = getCmd(cmdStr);
 
     if (cmd != NULL){
