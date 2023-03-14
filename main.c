@@ -116,7 +116,7 @@ void* cmdDecodeThread(void *arg){
         else
             pthread_exit(NULL);
         
-        ethStr = "";
+        strncpy(ethStr,"",CMD_MAX_LEN);
     }
 
     pthread_exit((void *)cmdArg->cmdID);
