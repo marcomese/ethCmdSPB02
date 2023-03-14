@@ -60,6 +60,11 @@ typedef struct chkFifoArgs{
     uint32_t* fifoData;
 } chkFifoArgs_t;
 
+typedef struct monitorArgs{
+    axiRegisters_t* regs;
+    uint32_t* cmdID;
+} monitorArgs_t;
+
 typedef struct spb2Data{
     uint32_t     header;
     uint32_t     unixTime;
@@ -194,18 +199,41 @@ void* checkFifoThread(void *arg){
     pthread_exit((void *)chkArg->fifoData);
 }
 
+void* monitorThread(void* arg){
+    monitorArgs_t* monitorArg = (monitorArgs_t*)arg;
+    uint32_t newStatusReg = 0;
+    uint32_t oldStatusReg = 0;
+
+    while(1){
+        newStatusReg = arg->regs->statusReg;
+
+        if(newStatusReg != oldStatusReg){
+            oldStatusReg = newStatusReg;
+            printf("status = 0x%08x\n"
+                   "ctrlReg = 0x%08x\n"
+                   "cmdID = %d",
+                   newStatusReg,
+                   arg->regs->ctrlReg,
+                   arg->cmdID);
+        }
+    }
+}
+
 int main(int argc, char *argv[]){
     axiRegisters_t axiRegs;
     cmdDecodeArgs_t cmdDecodeArg;
     chkFifoArgs_t chkFifoArg;
+    monitorArgs_t monitorArg;
     pthread_t cmdDecID;
     pthread_t chkSttID;
+    pthread_t monitorID;
     int listenfd = 0;
     int connfd = 0;
     struct sockaddr_in serv_addr;
     uint32_t* fifoData;
     uint32_t cmdDecRetVal = 0;
     uint32_t chkSttRetVal = 0;
+    uint32_t monitorRetVal = 0;
     uint32_t cmdID = NONE;
     int socketStatus = 1;
     int err = -1;
@@ -301,6 +329,9 @@ int main(int argc, char *argv[]){
     chkFifoArg.socketStatus = &socketStatus;
     chkFifoArg.fifoData = fifoData;
 
+    monitorArg.regs = &axiRegs;
+    monitorArg.cmdID = &cmdID;
+
     while (1)
     {
         cmdID = NONE;
@@ -335,8 +366,16 @@ int main(int argc, char *argv[]){
             continue;
         }
 
+        err = pthread_create(&monitorID, NULL, &monitorThread, (void*)&monitorArg);
+                if(err != 0){
+                    printf("\tERR: Cannot create checkFifo thread, disconnecting...: [%s]\n", strerror(err));
+                    close(connfd);
+                    continue;
+                }
+
         pthread_join(cmdDecID, (void**)&cmdDecRetVal);
         pthread_join(chkSttID, (void**)&chkSttRetVal);
+        pthread_join(monitorID, (void**)&monitorRetVal);
         pthread_mutex_destroy(&mtx);
 
         close(connfd);
