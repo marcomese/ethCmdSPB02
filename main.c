@@ -118,11 +118,11 @@ void* cmdDecodeThread(void *arg){
         
         printf("cmdID = %d",*cmdArg->cmdID);
 
-        strncpy(ethStr,"",CMD_MAX_LEN);
+/*         strncpy(ethStr,"",CMD_MAX_LEN); */
     }
 
     pthread_exit((void *)cmdArg->cmdID);
-}
+}   
 
 void* checkFifoThread(void *arg){
     FILE *outFile;
