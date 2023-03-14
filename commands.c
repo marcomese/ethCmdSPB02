@@ -102,8 +102,6 @@ static void readCmd(axiRegisters_t *regDev, int connfd, cmd_t *c){
     char resStr[TCP_SND_BUF] = "";
     uint32_t* reg;
     
-    printf("cmdVal = %s",c->cmdVal);
-
     switch(c->cmdVal){
         case READ_STATUS:
             reg = regDev->statusReg;
@@ -197,6 +195,8 @@ uint32_t decodeCmdStr(axiRegisters_t* regDev, int connfd, char *ethStr){
     for (int i = 0; (ethStr[i] != '\r') && (ethStr[i] != '\n'); i++)
         if (i < CMD_MAX_LEN)
             cmdStr[i] = ethStr[i];
+
+    printf("cmdStr = %s, ethStr = %s\n",cmdStr,ethStr);
 
     cmd_t *cmd = getCmd(cmdStr);
 
