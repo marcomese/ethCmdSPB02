@@ -205,7 +205,7 @@ void* monitorThread(void* arg){
     uint32_t oldStatusReg = 0;
 
     while(1){
-        newStatusReg = monitorArg->regs->statusReg;
+        newStatusReg = *(monitorArg->regs->statusReg);
 
         if(newStatusReg != oldStatusReg){
             oldStatusReg = newStatusReg;
@@ -213,8 +213,8 @@ void* monitorThread(void* arg){
                    "ctrlReg = 0x%08x\n"
                    "cmdID = %d",
                    newStatusReg,
-                   monitorArg->regs->ctrlReg,
-                   monitorArg->cmdID);
+                   *(monitorArg->regs->ctrlReg),
+                   *(monitorArg->cmdID));
         }
     }
 }
