@@ -101,7 +101,7 @@ typedef struct canReaderArgs{
 } canReaderArgs_t;
 
 typedef struct imuDataOutArgs{
-    uint32_t  cmdID;
+    uint32_t*  cmdID;
     uint32_t* imuTimestamp;
     int16_t*  rawAccel;
     int16_t*  rawGyro;
@@ -340,6 +340,7 @@ void* canReaderThread(void *arg){
 void* imuDataOutThread(void* arg){
     imuDataOutArgs_t* imuArg = (imuDataOutArgs_t*)arg;
     uint32_t cmdIDLocal = 0;
+    unsigned int exitCondition = 0;
     int err = -1;
     int imuSockFd = 0;
     int imuConnFd = 0;
