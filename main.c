@@ -25,6 +25,7 @@
 #include "madgwickFilter.h"
 
 #define CONN_PORT        5000
+#define IMU_PORT         5050
 #define CONN_MAX_QUEUE   10
 
 #define BIND_MAX_TRIES   10
@@ -65,6 +66,8 @@
 #define GYRO_Y_OFFSET 27.80
 #define GYRO_Z_OFFSET 54.97
 
+#define IMUSTR_MAX_LEN 1024
+
 const float gyroOffset[3] = {GYRO_X_OFFSET,
                                 GYRO_Y_OFFSET,
                                 GYRO_Z_OFFSET};
@@ -87,13 +90,25 @@ typedef struct chkFifoArgs{
 } chkFifoArgs_t;
 
 typedef struct canReaderArgs{
+    uint32_t* cmdID;
     int       canSocket;
     uint32_t* imuTimestamp;
     int16_t*  rawAccel;
     int16_t*  rawGyro;
     float*    accel;
     float*    gyro;
+    float*    eulers;
 } canReaderArgs_t;
+
+typedef struct imuDataOutArgs{
+    uint32_t  cmdID;
+    int16_t*  rawAccel;
+    int16_t*  rawGyro;
+    float*    accel;
+    float*    gyro;
+    float*    quaternions;
+    float*    eulerAngles;
+} imuDataOutArgs_t;
 
 typedef struct spb2Data{
     uint32_t     header;
@@ -174,22 +189,17 @@ void* checkFifoThread(void *arg){
     spb2Data_t data = {0, 0, 0, 0, 0, 0, 0, 0, "", 0};
 
     while(!exitCondition){
-        printf("wait for dma transfer");
         dma_transfer_s2mm(chkArg->regs->dmaReg, DATA_BYTES, chkArg->socketStatus, chkArg->cmdID, chkArg->regs->statusReg, &mtx);
 
         pthread_mutex_lock(&mtx);
-        printf("mutex locked");
         socketStatusLocal = *chkArg->socketStatus;
         cmdIDLocal = *chkArg->cmdID;
         imuTimestamp = *chkArg->imuTimestamp;
         pthread_mutex_unlock(&mtx);
-        printf("mutex unlocked");
 
         exitCondition = (socketStatusLocal <= 0) || (cmdIDLocal == EXIT);
 
         statusReg = *(chkArg->regs->statusReg);
-
-        printf("statusReg = 0x%08x",statusReg);
 
         running = statusReg & RUN_STATUS_MASK;
 
@@ -213,8 +223,6 @@ void* checkFifoThread(void *arg){
             data.deadTime  = *(chkArg->fifoData+DEADT_IDX);
             data.status    = statusReg;
 
-            printf("imu timestamp = 0x%08x",data.trgFlag);
-
             for(int i = DATA_NUMERICS; i < DATA_WORDS; i++){
                 data.gpsStr[((i-DATA_NUMERICS)*4)]     = (char)(*(chkArg->fifoData+i)  & 0x000000FF);
                 data.gpsStr[(((i-DATA_NUMERICS)*4)+1)] = (char)((*(chkArg->fifoData+i) & 0x0000FF00) >> 8);
@@ -236,14 +244,14 @@ void* checkFifoThread(void *arg){
         }
     }
 
-    printf("checkFIFOThread EXITED!");
-
     pthread_exit((void *)chkArg->fifoData);
 }
 
 void* canReaderThread(void *arg){
     canReaderArgs_t* canArg = (canReaderArgs_t*)arg;
     struct can_frame frame;
+    unsigned int exitCondition = 0;
+    uint32_t cmdIDLocal = 0;
     int      nBytes    = 0;
     uint8_t  dataIdx   = 0;
     uint32_t timestamp = 0;
@@ -252,12 +260,19 @@ void* canReaderThread(void *arg){
     float    accelN[3] = {0.0,0.0,0.0};
     int16_t  gyro[3]   = {0,0,0};
     float    gyroF[3]  = {0.0,0.0,0.0};
-    float    roll      = 0.0;
-    float    pitch     = 0.0;
-    float    yaw       = 0.0;
+    float    eulers[3] = {0.0,0.0,0.0};
 
-    while(nBytes >= 0){
+    while(1){
         nBytes = read(canArg->canSocket, &frame, sizeof(struct can_frame));
+
+        pthread_mutex_lock(&mtx);
+        cmdIDLocal = *canArg->cmdID;
+        pthread_mutex_unlock(&mtx);
+
+        exitCondition = (nBytes <= 0) || (cmdIDLocal == EXIT);
+
+        if(exitCondition != 0)
+            break;
 
         dataIdx = frame.data[0];
 
@@ -289,18 +304,19 @@ void* canReaderThread(void *arg){
             }
 
             pthread_mutex_lock(&mtx);
+            imu_filter(accelF[0], accelF[1], accelF[2], gyroF[0], gyroF[1], gyroF[2]);
+
+            eulerAngles(q_est, &eulers[0], &eulers[1], &eulers[2]);
+
             *canArg->imuTimestamp = timestamp;
             memcpy(canArg->rawAccel,accel,sizeof(accel));
             memcpy(canArg->rawGyro,gyro,sizeof(gyro));
             memcpy(canArg->accel,accelN,sizeof(accelN));
             memcpy(canArg->gyro,gyroF,sizeof(gyroF));
+            memcpy(canArg->eulers,eulers,sizeof(eulers));
             pthread_mutex_unlock(&mtx);
 
-            imu_filter(accelF[0], accelF[1], accelF[2], gyroF[0], gyroF[1], gyroF[2]);
-
-            eulerAngles(q_est, &roll, &pitch, &yaw);
-
-            printf("\tT = %08x\n"
+/*             printf("\tT = %08x\n"
                    "\t\taxR = %d, ayR = %d, azR = %d\n"
                    "\t\taxN = %.4f, ayN = %.4f, azN = %.4f\n"
                    "\t\tgx = %.4f, gy = %.4f, gz = %.4f\n"
@@ -313,11 +329,79 @@ void* canReaderThread(void *arg){
                    canArg->gyro[0],canArg->gyro[1],canArg->gyro[2],
                    canArg->rawGyro[0],canArg->rawGyro[1],canArg->rawGyro[2],
                    q_est.q1,q_est.q2,q_est.q3,q_est.q4,
-                   roll,pitch,yaw);
+                   roll,pitch,yaw); */
         }
     }
+
     fprintf(stderr,"ERR: error reading from CAN...\n");
     pthread_exit((void *)nBytes);
+}
+
+void* imuDataOutThread(void* args){
+    imuDataOutArgs_t* imuArg = (imuDataOutArgs_t*)arg;
+    int imuSockFd = 0;
+    int imuConnFd = 0;
+    struct sockaddr_in imu_addr;
+    char imuStr[IMUSTR_MAX_LEN] = "";
+
+    imuSockFd = socket(AF_INET, SOCK_STREAM, 0);
+    memset(&imu_addr, '0', sizeof(imu_addr));
+
+    imu_addr.sin_family = AF_INET;
+    imu_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    imu_addr.sin_port = htons(IMU_PORT);
+
+    err = bind(imuSockFd, (struct sockaddr*)&imu_addr, sizeof(imu_addr));
+    if(err < 0){
+        fprintf(stderr,"\tERR: Error in bind function: [%d]\nRetry %d...\n", err, tries);
+        pthread_exit((void *)err);
+    }
+
+    err = listen(imuSockFd, CONN_MAX_QUEUE);
+    if(err < 0){
+        fprintf(stderr,"\tERR: Error in listen function: [%d]\nRetry %d...\n", err, tries);
+        pthread_exit((void *)err);
+    }
+
+    imuConnFd = accept(imuSockFd, (struct sockaddr*)NULL, NULL);
+    if(imuConnFd < 0){
+        fprintf(stderr,"\tERR: Error in accept: [%s]\n", strerror(err));
+        pthread_exit((void *)imuConnFd);
+    }
+
+    while(1){
+        pthread_mutex_lock(&mtx);
+        cmdIDLocal = *imuArg->cmdID;
+        pthread_mutex_unlock(&mtx);
+
+        exitCondition = (imuSockFd <= 0) || (cmdIDLocal == EXIT);
+
+        if(exitCondition != 0)
+            break;
+
+        pthread_mutex_lock(&mtx);
+        snprintf(imuStr,IMUSTR_MAX_LEN,
+                "\tT = %08x\n"
+                "\t\taxR = %d, ayR = %d, azR = %d\n"
+                "\t\taxN = %.4f, ayN = %.4f, azN = %.4f\n"
+                "\t\tgx = %.4f, gy = %.4f, gz = %.4f\n"
+                "\t\tgxR = %d, gyR = %d, gzR = %d\n"
+                "\t\tq1 = %.3f, q2 = %.3f, q3 = %.3f, q4 = %.3f\n"
+                "\t\troll = %.3f, pitch = %.3f, yaw = %.3f\n",
+                *imuArg->imuTimestamp,
+                imuArg->rawAccel[0],imuArg->rawAccel[1],imuArg->rawAccel[2],
+                imuArg->accel[0],imuArg->accel[1],imuArg->accel[2],
+                imuArg->gyro[0],imuArg->gyro[1],imuArg->gyro[2],
+                imuArg->rawGyro[0],imuArg->rawGyro[1],imuArg->rawGyro[2],
+                q_est.q1,q_est.q2,q_est.q3,q_est.q4,
+                roll,pitch,yaw);
+        pthread_mutex_unlock(&mtx);
+
+        write(imuSockFd,imuStr,strlen(imuStr));
+    }
+
+    close(imuConnFd);
+    pthread_exit((void *)imuConnFd);
 }
 
 int main(int argc, char *argv[]){
@@ -325,6 +409,7 @@ int main(int argc, char *argv[]){
     cmdDecodeArgs_t cmdDecodeArg;
     chkFifoArgs_t chkFifoArg;
     canReaderArgs_t canReaderArgs;
+    imuDataOutArgs_t imuDataOutArgs;
     pthread_t cmdDecID;
     pthread_t chkSttID;
     pthread_t canRdrID;
@@ -441,13 +526,6 @@ int main(int argc, char *argv[]){
     chkFifoArg.fifoData     = fifoData;
     chkFifoArg.imuTimestamp = &imuTimestamp;
 
-    canReaderArgs.canSocket    = canSocket;
-    canReaderArgs.imuTimestamp = &imuTimestamp;
-    canReaderArgs.rawAccel     = rawAccel;
-    canReaderArgs.rawGyro      = rawGyro;
-    canReaderArgs.accel        = accel;
-    canReaderArgs.gyro         = gyro;
-
     canSocket = socket(PF_CAN, SOCK_RAW, CAN_RAW);
     if(canSocket < 0)
         fprintf(stderr,"\tERR: Cannot initialize CAN socket...\n");
@@ -467,6 +545,15 @@ int main(int argc, char *argv[]){
     rfilter.can_mask = 0x0FF;
 
     setsockopt(canSocket, SOL_CAN_RAW, CAN_RAW_FILTER, &rfilter, sizeof(rfilter));
+
+    canReaderArgs.canSocket    = canSocket;
+    canReaderArgs.imuTimestamp = &imuTimestamp;
+    canReaderArgs.rawAccel     = rawAccel;
+    canReaderArgs.rawGyro      = rawGyro;
+    canReaderArgs.accel        = accel;
+    canReaderArgs.gyro         = gyro;
+
+    imuDataOutArgs.
 
     if(canSocket >= 0){
         err = pthread_create(&canRdrID, NULL, &canReaderThread, (void*)&canReaderArgs);
