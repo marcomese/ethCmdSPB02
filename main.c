@@ -431,14 +431,14 @@ int main(int argc, char *argv[]){
         return -1;
     }
 
-    cmdDecodeArg.regs = &axiRegs;
-    cmdDecodeArg.cmdID = &cmdID;
+    cmdDecodeArg.regs         = &axiRegs;
+    cmdDecodeArg.cmdID        = &cmdID;
     cmdDecodeArg.socketStatus = &socketStatus;
 
-    chkFifoArg.regs = &axiRegs;
-    chkFifoArg.cmdID = &cmdID;
+    chkFifoArg.regs         = &axiRegs;
+    chkFifoArg.cmdID        = &cmdID;
     chkFifoArg.socketStatus = &socketStatus;
-    chkFifoArg.fifoData = fifoData;
+    chkFifoArg.fifoData     = fifoData;
     chkFifoArg.imuTimestamp = &imuTimestamp;
 
     canReaderArgs.canSocket    = canSocket;
@@ -463,6 +463,11 @@ int main(int argc, char *argv[]){
     if (err < 0)
         fprintf(stderr,"\tERR: Cannot bind CAN socket...\n");
 
+    rfilter.can_id   = 0x0B2;
+    rfilter.can_mask = 0x0FF;
+
+    setsockopt(canSocket, SOL_CAN_RAW, CAN_RAW_FILTER, &rfilter, sizeof(rfilter));
+
     if(canSocket >= 0){
         err = pthread_create(&canRdrID, NULL, &canReaderThread, (void*)&canReaderArgs);
         if(err != 0){
@@ -470,11 +475,6 @@ int main(int argc, char *argv[]){
             close(canSocket);
         }
     }
-
-    rfilter.can_id   = 0x0B2;
-    rfilter.can_mask = 0x0FF;
-
-    setsockopt(canSocket, SOL_CAN_RAW, CAN_RAW_FILTER, &rfilter, sizeof(rfilter));
 
     while (1)
     {
