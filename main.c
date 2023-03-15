@@ -65,7 +65,7 @@
 #define GYRO_Y_OFFSET 27.80
 #define GYRO_Z_OFFSET 54.97
 
-constant float gyroOffset[3] = {GYRO_X_OFFSET,
+const float gyroOffset[3] = {GYRO_X_OFFSET,
                                 GYRO_Y_OFFSET,
                                 GYRO_Z_OFFSET};
 
