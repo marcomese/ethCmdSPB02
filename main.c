@@ -565,7 +565,7 @@ int main(int argc, char *argv[]){
     }
 
     err = pthread_create(&imuDatID, NULL, &imuDataOutThread, (void*)&imuDataOutArgs);
-    if(err != 0){
+    if(err != 0)
         fprintf(stderr,"\tERR: Cannot create imuDataOut thread...: [%s]\n", strerror(err));
 
     while (1)
