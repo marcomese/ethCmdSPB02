@@ -315,21 +315,6 @@ void* canReaderThread(void *arg){
             memcpy(canArg->gyro,gyroF,sizeof(gyroF));
             memcpy(canArg->eulers,eulers,sizeof(eulers));
             pthread_mutex_unlock(&mtx);
-
-/*             printf("\tT = %08x\n"
-                   "\t\taxR = %d, ayR = %d, azR = %d\n"
-                   "\t\taxN = %.4f, ayN = %.4f, azN = %.4f\n"
-                   "\t\tgx = %.4f, gy = %.4f, gz = %.4f\n"
-                   "\t\tgxR = %d, gyR = %d, gzR = %d\n"
-                   "\t\tq1 = %.3f, q2 = %.3f, q3 = %.3f, q4 = %.3f\n"
-                   "\t\troll = %.3f, pitch = %.3f, yaw = %.3f\n",
-                   *canArg->imuTimestamp,
-                   canArg->rawAccel[0],canArg->rawAccel[1],canArg->rawAccel[2],
-                   canArg->accel[0],canArg->accel[1],canArg->accel[2],
-                   canArg->gyro[0],canArg->gyro[1],canArg->gyro[2],
-                   canArg->rawGyro[0],canArg->rawGyro[1],canArg->rawGyro[2],
-                   q_est.q1,q_est.q2,q_est.q3,q_est.q4,
-                   roll,pitch,yaw); */
         }
     }
 
