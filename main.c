@@ -352,13 +352,14 @@ void* imuDataOutThread(void* arg){
         pthread_exit((void *)err);
     }
 
-    imuConnFd = accept(imuSockFd, (struct sockaddr*)NULL, NULL);
-    if(imuConnFd < 0){
-        fprintf(stderr,"\tERR: Error in accept: [%s]\n", strerror(err));
-        pthread_exit((void *)imuConnFd);
-    }
-
     while(1){
+        imuConnFd = accept(imuSockFd, (struct sockaddr*)NULL, NULL);
+
+        if(imuConnFd < 0){
+            fprintf(stderr,"\tERR: Error in accept: [%s]\n", strerror(err));
+            pthread_exit((void *)imuConnFd);
+        }
+
         pthread_mutex_lock(&mtx);
         snprintf(imuStr,IMUSTR_MAX_LEN,
                 "\tT = %08x\n"
