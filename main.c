@@ -302,8 +302,8 @@ void* canReaderThread(void *arg){
 
             printf("\tT = %08x\n"
                    "\t\taxR = %d, ayR = %d, azR = %d\n"
-                   "\t\taxN = %.3f, ayN = %.3f, azN = %.3f\n"
-                   "\t\tgx = %.2f, gy = %.2f, gz = %.2f\n"
+                   "\t\taxN = %.4f, ayN = %.4f, azN = %.4f\n"
+                   "\t\tgx = %.4f, gy = %.4f, gz = %.4f\n"
                    "\t\tgxR = %d, gyR = %d, gzR = %d\n"
                    "\t\tq1 = %.3f, q2 = %.3f, q3 = %.3f, q4 = %.3f\n"
                    "\t\troll = %.3f, pitch = %.3f, yaw = %.3f\n",
