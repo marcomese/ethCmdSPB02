@@ -403,6 +403,7 @@ int main(int argc, char *argv[]){
     pthread_t cmdDecID;
     pthread_t chkSttID;
     pthread_t canRdrID;
+    pthread_t imuDatID;
     int listenfd = 0;
     int connfd = 0;
     struct sockaddr_in serv_addr;
@@ -410,6 +411,7 @@ int main(int argc, char *argv[]){
     uint32_t cmdDecRetVal = 0;
     uint32_t chkSttRetVal = 0;
     uint32_t canRdrRetVal = 0;
+    uint32_t imuDatRetVal = 0;
     uint32_t canData = 0;
     uint32_t cmdID = NONE;
     int socketStatus = 1;
@@ -562,6 +564,10 @@ int main(int argc, char *argv[]){
         }
     }
 
+    err = pthread_create(&imuDatID, NULL, &imuDataOutThread, (void*)&imuDataOutArgs);
+    if(err != 0){
+        fprintf(stderr,"\tERR: Cannot create imuDataOut thread...: [%s]\n", strerror(err));
+
     while (1)
     {
         cmdID = NONE;
@@ -604,4 +610,5 @@ int main(int argc, char *argv[]){
     }
 
     pthread_join(canRdrID, (void**)&canRdrRetVal);
+    pthread_join(imuDatID, (void**)&imuDatRetVal);
 }
