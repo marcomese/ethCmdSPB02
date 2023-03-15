@@ -360,17 +360,6 @@ void* imuDataOutThread(void* arg){
 
     while(1){
         pthread_mutex_lock(&mtx);
-        cmdIDLocal = *imuArg->cmdID;
-        pthread_mutex_unlock(&mtx);
-
-        socketStatus = read(imuConnFd, NULL, 1);
-
-        exitCondition = (socketStatus <= 0) || (cmdIDLocal == EXIT);
-
-        if(exitCondition != 0)
-            break;
-
-        pthread_mutex_lock(&mtx);
         snprintf(imuStr,IMUSTR_MAX_LEN,
                 "\tT = %08x\n"
                 "\t\taxR = %d, ayR = %d, azR = %d\n"
@@ -386,9 +375,15 @@ void* imuDataOutThread(void* arg){
                 imuArg->rawGyro[0],imuArg->rawGyro[1],imuArg->rawGyro[2],
                 q_est.q1,q_est.q2,q_est.q3,q_est.q4,
                 imuArg->eulers[0],imuArg->eulers[1],imuArg->eulers[2]);
+        cmdIDLocal = *imuArg->cmdID;
         pthread_mutex_unlock(&mtx);
 
-        write(imuConnFd,imuStr,strlen(imuStr));
+        socketStatus = write(imuConnFd,imuStr,strlen(imuStr));
+
+        exitCondition = (socketStatus <= 0) || (cmdIDLocal == EXIT);
+
+        if(exitCondition != 0)
+            break;
 
         strncpy(imuStr,"",IMUSTR_MAX_LEN);
     }
