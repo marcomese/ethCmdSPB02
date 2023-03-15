@@ -297,14 +297,14 @@ void* canReaderThread(void *arg){
                    "\t\taxN = %.3f, ayN = %.3f, azN = %.3f\n"
                    "\t\tgx = %.2f, gy = %.2f, gz = %.2f\n"
                    "\t\tgxR = %d, gyR = %d, gzR = %d\n",
-                   "\t\tq0 = %.3f, q1 = %.3f, q2 = %.3f, q3 = %.3f\n",
+                   "\t\tq1 = %.3f, q2 = %.3f, q3 = %.3f, q4 = %.3f\n",
                    "\t\troll = %.3f, pitch = %.3f, yaw = %.3f\n",
                    *canArg->imuTimestamp,
                    canArg->rawAccel[0],canArg->rawAccel[1],canArg->rawAccel[2],
                    canArg->accel[0],canArg->accel[1],canArg->accel[2],
                    canArg->gyro[0],canArg->gyro[1],canArg->gyro[2],
                    canArg->rawGyro[0],canArg->rawGyro[1],canArg->rawGyro[2],
-                   q_est[0],q_est[1],q_est[2],q_est[3],
+                   q_est.q1,q_est.q2,q_est.q3,q_est.q4,
                    roll,pitch,yaw);
         }
     }
