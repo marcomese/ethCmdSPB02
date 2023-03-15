@@ -389,7 +389,7 @@ void* imuDataOutThread(void* arg){
                 imuArg->eulers[0],imuArg->eulers[1],imuArg->eulers[2]);
         pthread_mutex_unlock(&mtx);
 
-        write(imuSockFd,imuStr,strlen(imuStr));
+        write(imuConnFd,imuStr,strlen(imuStr));
 
         strncpy(imuStr,"",IMUSTR_MAX_LEN);
     }
