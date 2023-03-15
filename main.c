@@ -263,9 +263,9 @@ void* canReaderThread(void *arg){
 
         switch(dataIdx){
             case CAN_TIMESTAMP_ID:
-                timestamp = frame.data[1]       |
-                            frame.data[2] << 8  |
-                            frame.data[3] << 16 |
+                timestamp = frame.data[1]      |
+                            frame.data[2] << 8 |
+                            frame.data[3] << 16|
                             frame.data[4] << 24;
                 break;
             case CAN_AX_ID:
@@ -441,6 +441,13 @@ int main(int argc, char *argv[]){
     chkFifoArg.fifoData = fifoData;
     chkFifoArg.imuTimestamp = &imuTimestamp;
 
+    canReaderArgs.canSocket    = canSocket;
+    canReaderArgs.imuTimestamp = &imuTimestamp;
+    canReaderArgs.rawAccel     = rawAccel;
+    canReaderArgs.rawGyro      = rawGyro;
+    canReaderArgs.accel        = accel;
+    canReaderArgs.gyro         = gyro;
+
     canSocket = socket(PF_CAN, SOCK_RAW, CAN_RAW);
     if(canSocket < 0)
         fprintf(stderr,"\tERR: Cannot initialize CAN socket...\n");
@@ -468,13 +475,6 @@ int main(int argc, char *argv[]){
     rfilter.can_mask = 0x0FF;
 
     setsockopt(canSocket, SOL_CAN_RAW, CAN_RAW_FILTER, &rfilter, sizeof(rfilter));
-
-    canReaderArgs.canSocket    = canSocket;
-    canReaderArgs.imuTimestamp = &imuTimestamp;
-    canReaderArgs.rawAccel     = rawAccel;
-    canReaderArgs.rawGyro      = rawGyro;
-    canReaderArgs.accel        = accel;
-    canReaderArgs.gyro         = gyro;
 
     while (1)
     {
