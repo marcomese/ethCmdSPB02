@@ -244,6 +244,9 @@ void* canReaderThread(void *arg){
     float    accelN[3] = {0.0,0.0,0.0};
     int16_t  gyro[3]   = {0,0,0};
     float    gyroF[3]  = {0.0,0.0,0.0};
+    float    roll      = 0.0;
+    float    pitch     = 0.0;
+    float    yaw       = 0.0;
 
     while(nBytes >= 0){
         nBytes = read(canArg->canSocket, &frame, sizeof(struct can_frame));
@@ -285,16 +288,24 @@ void* canReaderThread(void *arg){
             memcpy(canArg->gyro,gyroF,sizeof(gyroF));
             pthread_mutex_unlock(&mtx);
 
+            imu_filter(accel[0], accel[1], accel[2], gyro[0], gyro[1], gyro[2]);
+
+            eulerAngles(q_est, &roll, &pitch, &yaw);
+
             printf("\tT = %08x\n"
                    "\t\taxR = %d, ayR = %d, azR = %d\n"
                    "\t\taxN = %.3f, ayN = %.3f, azN = %.3f\n"
                    "\t\tgx = %.2f, gy = %.2f, gz = %.2f\n"
                    "\t\tgxR = %d, gyR = %d, gzR = %d\n",
+                   "\t\tq0 = %.3f, q1 = %.3f, q2 = %.3f, q3 = %.3f\n",
+                   "\t\troll = %.3f, pitch = %.3f, yaw = %.3f\n",
                    *canArg->imuTimestamp,
                    canArg->rawAccel[0],canArg->rawAccel[1],canArg->rawAccel[2],
                    canArg->accel[0],canArg->accel[1],canArg->accel[2],
                    canArg->gyro[0],canArg->gyro[1],canArg->gyro[2],
-                   canArg->rawGyro[0],canArg->rawGyro[1],canArg->rawGyro[2]);
+                   canArg->rawGyro[0],canArg->rawGyro[1],canArg->rawGyro[2],
+                   q_est[0],q_est[1],q_est[2],q_est[3],
+                   roll,pitch,yaw);
         }
     }
     fprintf(stderr,"ERR: error reading from CAN...\n");
