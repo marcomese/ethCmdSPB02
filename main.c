@@ -332,6 +332,7 @@ void* imuDataOutThread(void* arg){
     int imuConnFd = 0;
     struct sockaddr_in imu_addr;
     char imuStr[IMUSTR_MAX_LEN] = "";
+    char oldImuStr[IMUSTR_MAX_LEN] = "";
 
     imuSockFd = socket(AF_INET, SOCK_STREAM, 0);
     memset(&imu_addr, '0', sizeof(imu_addr));
@@ -380,7 +381,10 @@ void* imuDataOutThread(void* arg){
             cmdIDLocal = *imuArg->cmdID;
             pthread_mutex_unlock(&mtx);
 
-            socketStatus = write(imuConnFd,imuStr,strlen(imuStr));
+            if(strncmp(imuStr,oldImuStr,IMUSTR_MAX_LEN) != 0){
+                socketStatus = write(imuConnFd,imuStr,strlen(imuStr));
+                strncpy(oldImuStr,imuStr,IMUSTR_MAX_LEN);
+            }
 
             exitCondition = (socketStatus <= 0) || (cmdIDLocal == EXIT);
 
