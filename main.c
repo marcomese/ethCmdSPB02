@@ -61,6 +61,14 @@
 #define ACCEL_SCALE 2.0/32767.0
 #define GYRO_SCALE 2000.0/32767.0
 
+#define GYRO_X_OFFSET 61.98
+#define GYRO_Y_OFFSET 27.80
+#define GYRO_Z_OFFSET 54.97
+
+constant float gyroOffset[3] = {GYRO_X_OFFSET,
+                                GYRO_Y_OFFSET,
+                                GYRO_Z_OFFSET};
+
 pthread_mutex_t mtx;
 
 typedef struct cmdDecodeArgs{
@@ -275,7 +283,7 @@ void* canReaderThread(void *arg){
         if(dataIdx == CAN_GZ_ID){
             for(int i = 0; i < 3; i++){
                 accelF[i] = accel[i]*ACCEL_SCALE;
-                gyroF[i] = gyro[i]*GYRO_SCALE*M_PI/180.0;
+                gyroF[i] = (gyro[i]-gyroOffset[i])*GYRO_SCALE*M_PI/180.0;
 
                 accelN[i] = accelF[i]/sqrt(pow(accelF[0],2)+pow(accelF[1],2)+pow(accelF[2],2));
             }
