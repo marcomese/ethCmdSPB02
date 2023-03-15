@@ -1,6 +1,6 @@
 CC = gcc
-DEPS = commands.h registers.h dma.h crc32.h
-OBJ = main.o commands.o registers.o dma.o crc32.o
+DEPS = commands.h registers.h dma.h crc32.h madgwickFilter.h
+OBJ = main.o commands.o registers.o dma.o crc32.o madgwickFilter.o
 LIBS = -lpthread -lm
 DBG = 0
 

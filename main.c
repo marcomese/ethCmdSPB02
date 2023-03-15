@@ -135,12 +135,16 @@ void* cmdDecodeThread(void *arg){
 
         pthread_mutex_lock(&mtx);
         *cmdArg->socketStatus = localSocketStatus;
-        pthread_mutex_unlock(&mtx);
 
         if(localSocketStatus > 0)
             *cmdArg->cmdID = decodeCmdStr(cmdArg->regs, cmdArg->connfd, ethStr);
-        else
+        else{
+            pthread_mutex_unlock(&mtx);
             pthread_exit(NULL);
+        }
+        pthread_mutex_unlock(&mtx);
+
+        strncpy(ethStr,"",CMD_MAX_LEN);
     }
 
     pthread_exit((void *)cmdArg->cmdID);
@@ -191,6 +195,7 @@ void* checkFifoThread(void *arg){
             outFile = fopen(fileName, "ab");
 
             data.header    = DATA_HEADER;
+            pthread_mutex_lock(&mtx);
             data.unixTime  = (uint32_t)time(NULL);
             data.trgCount  = *(chkArg->fifoData+TRGCNT_IDX);
             data.gtuCount  = *(chkArg->fifoData+GTUCNT_IDX);
@@ -207,6 +212,8 @@ void* checkFifoThread(void *arg){
                 data.gpsStr[(((i-DATA_NUMERICS)*4)+2)] = (char)((*(chkArg->fifoData+i) & 0x00FF0000) >> 16);
                 data.gpsStr[(((i-DATA_NUMERICS)*4)+3)] = (char)((*(chkArg->fifoData+i) & 0xFF000000) >> 24);
             }
+
+            pthread_mutex_unlock(&mtx);
 
             data.crc = crc_32((unsigned char *)&data, sizeof(data)-sizeof(data.crc), startCRC32);
 
