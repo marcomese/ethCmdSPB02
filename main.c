@@ -171,6 +171,8 @@ void* cmdDecodeThread(void *arg){
         strncpy(ethStr,"",CMD_MAX_LEN);
     }
 
+    printf("EXIT cmdDecode\n");
+
     pthread_exit((void *)cmdArg->cmdID);
 }
 
@@ -243,6 +245,8 @@ void* checkFifoThread(void *arg){
             unlockFile(fileName);
         }
     }
+
+    printf("EXIT checkFIFO\n");
 
     pthread_exit((void *)chkArg->fifoData);
 }
@@ -389,6 +393,8 @@ void* imuDataOutThread(void* arg){
 
         strncpy(imuStr,"",IMUSTR_MAX_LEN);
     }
+
+    printf("EXIT imuDataOut\n");
 
     close(imuConnFd);
     pthread_exit((void *)imuConnFd);
