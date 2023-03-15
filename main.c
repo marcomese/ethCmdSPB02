@@ -535,6 +535,7 @@ int main(int argc, char *argv[]){
 
     setsockopt(canSocket, SOL_CAN_RAW, CAN_RAW_FILTER, &rfilter, sizeof(rfilter));
 
+    canReaderArgs.cmdID        = &cmdID;
     canReaderArgs.canSocket    = canSocket;
     canReaderArgs.imuTimestamp = &imuTimestamp;
     canReaderArgs.rawAccel     = rawAccel;
