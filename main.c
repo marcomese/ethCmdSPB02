@@ -22,6 +22,7 @@
 #include "registers.h"
 #include "dma.h"
 #include "crc32.h"
+#include "madgwickFilter.h"
 
 #define CONN_PORT        5000
 #define CONN_MAX_QUEUE   10
