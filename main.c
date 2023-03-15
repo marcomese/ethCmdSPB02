@@ -385,7 +385,7 @@ void* imuDataOutThread(void* arg){
                 socketStatus = write(imuConnFd,imuStr,strlen(imuStr));
                 strncpy(oldImuStr,imuStr,IMUSTR_MAX_LEN);
             }else
-                socketStatus = write(imuConnFd,'\r',1);
+                socketStatus = write(imuConnFd,(char*)'\r',1);
 
             exitCondition = (socketStatus <= 0) || (cmdIDLocal == EXIT);
 
