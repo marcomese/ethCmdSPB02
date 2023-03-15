@@ -542,6 +542,7 @@ int main(int argc, char *argv[]){
     canReaderArgs.rawGyro      = rawGyro;
     canReaderArgs.accel        = accel;
     canReaderArgs.gyro         = gyro;
+    canReaderArgs.eulers       = eulers;
 
     imuDataOutArgs.cmdID        = &cmdID;
     imuDataOutArgs.imuTimestamp = &imuTimestamp;
