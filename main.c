@@ -102,12 +102,12 @@ typedef struct canReaderArgs{
 
 typedef struct imuDataOutArgs{
     uint32_t  cmdID;
+    uint32_t* imuTimestamp;
     int16_t*  rawAccel;
     int16_t*  rawGyro;
     float*    accel;
     float*    gyro;
-    float*    quaternions;
-    float*    eulerAngles;
+    float*    eulers;
 } imuDataOutArgs_t;
 
 typedef struct spb2Data{
@@ -337,8 +337,10 @@ void* canReaderThread(void *arg){
     pthread_exit((void *)nBytes);
 }
 
-void* imuDataOutThread(void* args){
+void* imuDataOutThread(void* arg){
     imuDataOutArgs_t* imuArg = (imuDataOutArgs_t*)arg;
+    uint32_t cmdIDLocal = 0;
+    int err = -1;
     int imuSockFd = 0;
     int imuConnFd = 0;
     struct sockaddr_in imu_addr;
@@ -353,13 +355,13 @@ void* imuDataOutThread(void* args){
 
     err = bind(imuSockFd, (struct sockaddr*)&imu_addr, sizeof(imu_addr));
     if(err < 0){
-        fprintf(stderr,"\tERR: Error in bind function: [%d]\nRetry %d...\n", err, tries);
+        fprintf(stderr,"\tERR: Error in bind function: [%d]\nRetry %d...\n", err);
         pthread_exit((void *)err);
     }
 
     err = listen(imuSockFd, CONN_MAX_QUEUE);
     if(err < 0){
-        fprintf(stderr,"\tERR: Error in listen function: [%d]\nRetry %d...\n", err, tries);
+        fprintf(stderr,"\tERR: Error in listen function: [%d]\nRetry %d...\n", err);
         pthread_exit((void *)err);
     }
 
@@ -394,7 +396,7 @@ void* imuDataOutThread(void* args){
                 imuArg->gyro[0],imuArg->gyro[1],imuArg->gyro[2],
                 imuArg->rawGyro[0],imuArg->rawGyro[1],imuArg->rawGyro[2],
                 q_est.q1,q_est.q2,q_est.q3,q_est.q4,
-                roll,pitch,yaw);
+                imuArg->eulers[0],imuArg->eulers[1],imuArg->eulers[2]);
         pthread_mutex_unlock(&mtx);
 
         write(imuSockFd,imuStr,strlen(imuStr));
@@ -435,6 +437,7 @@ int main(int argc, char *argv[]){
     int16_t rawGyro[3]  = {0,0,0};
     float   accel[3]    = {0.0,0.0,0.0};
     float   gyro[3]     = {0.0,0.0,0.0};
+    float   eulers[3]   = {0.0,0.0,0.0};
 
     int devmem = open("/dev/mem", O_RDWR | O_SYNC);
     if (devmem < 0)
@@ -553,7 +556,13 @@ int main(int argc, char *argv[]){
     canReaderArgs.accel        = accel;
     canReaderArgs.gyro         = gyro;
 
-    imuDataOutArgs.
+    imuDataOutArgs.cmdID        = &cmdID;
+    imuDataOutArgs.imuTimestamp = &imuTimestamp;
+    imuDataOutArgs.rawAccel     = rawAccel;
+    imuDataOutArgs.rawGyro      = rawGyro;
+    imuDataOutArgs.accel        = accel;
+    imuDataOutArgs.gyro         = gyro;
+    imuDataOutArgs.eulers       = eulers;
 
     if(canSocket >= 0){
         err = pthread_create(&canRdrID, NULL, &canReaderThread, (void*)&canReaderArgs);
