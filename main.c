@@ -275,7 +275,7 @@ void* canReaderThread(void *arg){
         if(dataIdx == CAN_GZ_ID){
             for(int i = 0; i < 3; i++){
                 accelF[i] = accel[i]*ACCEL_SCALE;
-                gyroF[i] = gyro[i]*GYRO_SCALE;
+                gyroF[i] = gyro[i]*GYRO_SCALE*M_PI/180.0;
 
                 accelN[i] = accelF[i]/sqrt(pow(accelF[0],2)+pow(accelF[1],2)+pow(accelF[2],2));
             }
