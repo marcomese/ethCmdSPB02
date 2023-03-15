@@ -288,7 +288,7 @@ void* canReaderThread(void *arg){
             memcpy(canArg->gyro,gyroF,sizeof(gyroF));
             pthread_mutex_unlock(&mtx);
 
-            imu_filter(accel[0], accel[1], accel[2], gyro[0], gyro[1], gyro[2]);
+            imu_filter(accelF[0], accelF[1], accelF[2], gyroF[0], gyroF[1], gyroF[2]);
 
             eulerAngles(q_est, &roll, &pitch, &yaw);
 
