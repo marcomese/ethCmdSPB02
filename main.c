@@ -325,6 +325,7 @@ void* canReaderThread(void *arg){
 void* imuDataOutThread(void* arg){
     imuDataOutArgs_t* imuArg = (imuDataOutArgs_t*)arg;
     uint32_t cmdIDLocal = 0;
+    int socketStatus = 0;
     unsigned int exitCondition = 0;
     int err = -1;
     int imuSockFd = 0;
@@ -362,7 +363,9 @@ void* imuDataOutThread(void* arg){
         cmdIDLocal = *imuArg->cmdID;
         pthread_mutex_unlock(&mtx);
 
-        exitCondition = (imuSockFd <= 0) || (cmdIDLocal == EXIT);
+        socketStatus = read(imuConnFd, NULL, 1);
+
+        exitCondition = (socketStatus <= 0) || (cmdIDLocal == EXIT);
 
         if(exitCondition != 0)
             break;
