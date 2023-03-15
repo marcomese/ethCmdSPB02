@@ -381,16 +381,17 @@ void* imuDataOutThread(void* arg){
             cmdIDLocal = *imuArg->cmdID;
             pthread_mutex_unlock(&mtx);
 
-            if(strncmp(imuStr,oldImuStr,IMUSTR_MAX_LEN) != 0){
-                socketStatus = write(imuConnFd,imuStr,strlen(imuStr));
-                strncpy(oldImuStr,imuStr,IMUSTR_MAX_LEN);
-            }else
-                socketStatus = write(imuConnFd,"\r",1);
+            getpeername(imuConnFd,(struct sockaddr*)NULL, NULL);
 
-            exitCondition = (socketStatus <= 0) || (cmdIDLocal == EXIT);
+            exitCondition = (errno != 0) || (cmdIDLocal == EXIT);
 
             if(exitCondition != 0)
                 break;
+
+            if(strncmp(imuStr,oldImuStr,IMUSTR_MAX_LEN) != 0){
+                write(imuConnFd,imuStr,strlen(imuStr));
+                strncpy(oldImuStr,imuStr,IMUSTR_MAX_LEN);
+            }
 
             strncpy(imuStr,"",IMUSTR_MAX_LEN);
         }
