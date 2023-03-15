@@ -101,7 +101,7 @@ typedef struct canReaderArgs{
 } canReaderArgs_t;
 
 typedef struct imuDataOutArgs{
-    uint32_t*  cmdID;
+    uint32_t* cmdID;
     uint32_t* imuTimestamp;
     int16_t*  rawAccel;
     int16_t*  rawGyro;
