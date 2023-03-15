@@ -25,7 +25,7 @@
 #include "madgwickFilter.h"
 
 #define CONN_PORT        5000
-#define IMU_PORT         5050
+#define IMU_PORT         5001
 #define CONN_MAX_QUEUE   10
 
 #define BIND_MAX_TRIES   10
@@ -69,8 +69,8 @@
 #define IMUSTR_MAX_LEN 1024
 
 const float gyroOffset[3] = {GYRO_X_OFFSET,
-                                GYRO_Y_OFFSET,
-                                GYRO_Z_OFFSET};
+                             GYRO_Y_OFFSET,
+                             GYRO_Z_OFFSET};
 
 pthread_mutex_t mtx;
 
@@ -386,6 +386,8 @@ void* imuDataOutThread(void* arg){
         pthread_mutex_unlock(&mtx);
 
         write(imuSockFd,imuStr,strlen(imuStr));
+
+        strncpy(imuStr,"",IMUSTR_MAX_LEN);
     }
 
     close(imuConnFd);
