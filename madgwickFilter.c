@@ -67,8 +67,8 @@ void eulerAngles(float q1, float q2, float q3, float q4, float* roll, float* pit
     *pitch = -asinf(2*q2*q4 + 2*q1*q3);                                  // equatino (8)
     *roll  = atan2f((2*q3*q4 - 2*q1*q2), (2*q1*q1 + 2*q4*q4 -1));
     
-    *yaw *= (180.0f / PI);
-    *pitch *= (180.0f / PI);
-    *roll *= (180.0f / PI);
+    *yaw *= (180.0f / M_PI);
+    *pitch *= (180.0f / M_PI);
+    *roll *= (180.0f / M_PI);
 
 }
