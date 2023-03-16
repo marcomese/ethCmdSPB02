@@ -350,7 +350,7 @@ void* imuDataOutThread(void* arg){
                     imuArg->imu->gyro_raw.x, imuArg->imu->gyro_raw.y, imuArg->imu->gyro_raw.z,
                     imuArg->imu->accelerometer.x, imuArg->imu->accelerometer.y, imuArg->imu->accelerometer.z,
                     imuArg->imu->gyro.x, imuArg->imu->gyro.y, imuArg->imu->gyro.z,
-                    imuArg->imu->orientation.roll, imuArg->imu->orientation.pitch, imuArg->imu->orientation.yaw,
+                    imuArg->imu->orientation.roll*180.0/PI, imuArg->imu->orientation.pitch*180.0/PI, imuArg->imu->orientation.yaw*180.0/PI,
                     imuArg->imu->orientation_quat.w, imuArg->imu->orientation_quat.x, imuArg->imu->orientation_quat.y, imuArg->imu->orientation_quat.z);
 
             cmdIDLocal = *imuArg->cmdID;
