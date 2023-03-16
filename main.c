@@ -381,7 +381,7 @@ void* imuDataOutThread(void* arg){
             cmdIDLocal = *imuArg->cmdID;
             pthread_mutex_unlock(&mtx);
 
-            getpeername(imuSockFd,(struct sockaddr*)NULL, NULL);
+            getpeername(imuConnFd,(struct sockaddr*)NULL, NULL);
 
             exitCondition = (errno != 0) || (cmdIDLocal == EXIT);
 
