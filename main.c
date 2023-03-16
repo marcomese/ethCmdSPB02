@@ -307,7 +307,7 @@ void* canReaderThread(void *arg){
             }
 
             pthread_mutex_lock(&mtx);
-            updateFilter(gyroF[0], gyroF[1], gyroF[2],
+            filterUpdate(gyroF[0], gyroF[1], gyroF[2],
                          accelF[0], accelF[1], accelF[2],
                          &quater[0], &quater[1], &quater[2]);
 
