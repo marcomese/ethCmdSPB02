@@ -385,7 +385,7 @@ void* imuDataOutThread(void* arg){
                     imuArg->gyro[0],imuArg->gyro[1],imuArg->gyro[2],
                     imuArg->rawGyro[0],imuArg->rawGyro[1],imuArg->rawGyro[2],
                     imuArg->eulers[0],imuArg->eulers[1],imuArg->eulers[2],
-                    imuArg->quater[0],imuArg->quater[1],imuArg->quater[2],);
+                    imuArg->quater[0],imuArg->quater[1],imuArg->quater[2],imuArg->quater[3]);
 
             cmdIDLocal = *imuArg->cmdID;
             pthread_mutex_unlock(&mtx);
