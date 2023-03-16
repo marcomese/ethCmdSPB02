@@ -363,24 +363,22 @@ void* imuDataOutThread(void* arg){
 
         while(1){
             pthread_mutex_lock(&mtx);
-/*             snprintf(imuStr,IMUSTR_MAX_LEN,
+             snprintf(imuStr,IMUSTR_MAX_LEN,
                     "\tT = %08x\n"
                     "\t\taxR = %d, ayR = %d, azR = %d\n"
                     "\t\taxN = %.4f, ayN = %.4f, azN = %.4f\n"
                     "\t\tgx = %.4f, gy = %.4f, gz = %.4f\n"
                     "\t\tgxR = %d, gyR = %d, gzR = %d\n"
-                    "\t\tq1 = %.3f, q2 = %.3f, q3 = %.3f, q4 = %.3f\n"
-                    "\t\troll = %.3f, pitch = %.3f, yaw = %.3f\n",
+                    "\t\troll = %.3f, pitch = %.3f, yaw = %.3f\n"
+                    "$%c%.4f,%.4f,%.4f,%.4f\n",
                     *imuArg->imuTimestamp,
                     imuArg->rawAccel[0],imuArg->rawAccel[1],imuArg->rawAccel[2],
                     imuArg->accel[0],imuArg->accel[1],imuArg->accel[2],
                     imuArg->gyro[0],imuArg->gyro[1],imuArg->gyro[2],
                     imuArg->rawGyro[0],imuArg->rawGyro[1],imuArg->rawGyro[2],
-                    q_est.q1,q_est.q2,q_est.q3,q_est.q4,
-                    imuArg->eulers[0],imuArg->eulers[1],imuArg->eulers[2]); */
-            snprintf(imuStr,IMUSTR_MAX_LEN,
-                     "$%c%.4f,%.4f,%.4f,%.4f\n",2,
-                     q_est.q1,q_est.q2,q_est.q3,q_est.q4);
+                    imuArg->eulers[0],imuArg->eulers[1],imuArg->eulers[2],
+                    2,q_est.q1,q_est.q2,q_est.q3,q_est.q4,);
+
             cmdIDLocal = *imuArg->cmdID;
             pthread_mutex_unlock(&mtx);
 
