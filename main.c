@@ -522,9 +522,9 @@ int main(int argc, char *argv[]){
 	imu_set_calibration_mode(&imu, IMU_CALIBMODE_NEVER);
 	imu_set_gyro_scale_factor(&imu, GYRO_SCALE);
 	imu_set_accelerometer_scale_factor(&imu, ACCEL_SCALE);
-    imu.gyro_offset = { GYRO_X_OFFSET,
-                        GYRO_X_OFFSET,
-                        GYRO_X_OFFSET };
+    imu.gyro_offset.x = GYRO_X_OFFSET;
+    imu.gyro_offset.y = GYRO_Y_OFFSET;
+    imu.gyro_offset.z = GYRO_Z_OFFSET;
 
     canReaderArgs.cmdID        = &cmdID;
     canReaderArgs.canSocket    = canSocket;
