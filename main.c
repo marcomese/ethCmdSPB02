@@ -263,7 +263,6 @@ void* canReaderThread(void *arg){
     int16_t  gyro[3]   = {0,0,0};
     float    gyroF[3]  = {0.0,0.0,0.0};
     float    eulers[3] = {0.0,0.0,0.0};
-    float    quater[3] = {0.0,0.0,0.0};
 
     while(1){
         nBytes = read(canArg->canSocket, &frame, sizeof(struct can_frame));
@@ -309,9 +308,9 @@ void* canReaderThread(void *arg){
             pthread_mutex_lock(&mtx);
             filterUpdate(gyroF[0], gyroF[1], gyroF[2],
                          accelF[0], accelF[1], accelF[2],
-                         &quater[0], &quater[1], &quater[2], &quater[3]);
+                         &canArg->quater[0], &canArg->quater[1], &canArg->quater[2], &canArg->quater[3]);
 
-            eulerAngles(quater[0], quater[1], quater[2], quater[3],
+            eulerAngles(canArg->quater[0], canArg->quater[1], canArg->quater[2], canArg->quater[3],
                         &eulers[0], &eulers[1], &eulers[2]);
 
             *canArg->imuTimestamp = timestamp;
