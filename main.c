@@ -338,18 +338,18 @@ void* imuDataOutThread(void* arg){
             pthread_mutex_lock(&mtx);
              snprintf(imuStr,IMUSTR_MAX_LEN,
                     "$%c\tT = %08x\n"
-                    "\t\taxR = %.3f, ayR = %.3f, azR = %.3f\n"
-                    "\t\taxN = %.4f, ayN = %.4f, azN = %.4f\n"
+                    "\t\taxR = %.0f, ayR = %.0f, azR = %.0f\n"
+                    "\t\tgxR = %.0f, gyR = %.0f, gzR = %.0f\n"
+                    "\t\tax = %.4f, ay = %.4f, az = %.4f\n"
                     "\t\tgx = %.4f, gy = %.4f, gz = %.4f\n"
-                    "\t\tgxR = %.3f, gyR = %.3f, gzR = %.3f\n"
-                    "\t\troll = %.3f, pitch = %.3f, yaw = %.3f\n"
+                    "\t\troll = %.4f, pitch = %.4f, yaw = %.4f\n"
                     "Q%f,%f,%f,%f\n",
                     2,
                     *imuArg->imuTimestamp,
                     imuArg->imu->accelerometer_raw.x, imuArg->imu->accelerometer_raw.y, imuArg->imu->accelerometer_raw.z,
+                    imuArg->imu->gyro_raw.x, imuArg->imu->gyro_raw.y, imuArg->imu->gyro_raw.z,
                     imuArg->imu->accelerometer.x, imuArg->imu->accelerometer.y, imuArg->imu->accelerometer.z,
                     imuArg->imu->gyro.x, imuArg->imu->gyro.y, imuArg->imu->gyro.z,
-                    imuArg->imu->gyro_raw.x, imuArg->imu->gyro_raw.y, imuArg->imu->gyro_raw.z,
                     imuArg->imu->orientation.roll, imuArg->imu->orientation.pitch, imuArg->imu->orientation.yaw,
                     imuArg->imu->orientation_quat.w, imuArg->imu->orientation_quat.x, imuArg->imu->orientation_quat.y, imuArg->imu->orientation_quat.z);
 
