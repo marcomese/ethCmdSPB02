@@ -311,7 +311,7 @@ void* canReaderThread(void *arg){
                          accelF[0], accelF[1], accelF[2],
                          &quater[0], &quater[1], &quater[2]);
 
-            eulerAngles(quater[0], quater[1], quater[2], 
+            eulerAngles(quater[0], quater[1], quater[2], quater[3],
                         &eulers[0], &eulers[1], &eulers[2]);
 
             *canArg->imuTimestamp = timestamp;
