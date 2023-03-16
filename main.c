@@ -445,7 +445,7 @@ int main(int argc, char *argv[]){
     float   accel[3]    = {0.0,0.0,0.0};
     float   gyro[3]     = {0.0,0.0,0.0};
     float   eulers[3]   = {0.0,0.0,0.0};
-    float   quater[3]   = {0.0,0.0,0.0};
+    float   quater[3]   = {1.0,0.0,0.0};
 
     int devmem = open("/dev/mem", O_RDWR | O_SYNC);
     if (devmem < 0)
