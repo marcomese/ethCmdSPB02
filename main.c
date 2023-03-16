@@ -370,7 +370,7 @@ void* imuDataOutThread(void* arg){
                     "\t\tgx = %.4f, gy = %.4f, gz = %.4f\n"
                     "\t\tgxR = %d, gyR = %d, gzR = %d\n"
                     "\t\troll = %.3f, pitch = %.3f, yaw = %.3f\n"
-                    "Q%.4f,%.4f,%.4f,%.4f\n",
+                    "Q%f,%f,%f,%f\n",
                     2,
                     *imuArg->imuTimestamp,
                     imuArg->rawAccel[0],imuArg->rawAccel[1],imuArg->rawAccel[2],
