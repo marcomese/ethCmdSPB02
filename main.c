@@ -363,7 +363,7 @@ void* imuDataOutThread(void* arg){
 
         while(1){
             pthread_mutex_lock(&mtx);
-            snprintf(imuStr,IMUSTR_MAX_LEN,
+/*             snprintf(imuStr,IMUSTR_MAX_LEN,
                     "\tT = %08x\n"
                     "\t\taxR = %d, ayR = %d, azR = %d\n"
                     "\t\taxN = %.4f, ayN = %.4f, azN = %.4f\n"
@@ -377,7 +377,10 @@ void* imuDataOutThread(void* arg){
                     imuArg->gyro[0],imuArg->gyro[1],imuArg->gyro[2],
                     imuArg->rawGyro[0],imuArg->rawGyro[1],imuArg->rawGyro[2],
                     q_est.q1,q_est.q2,q_est.q3,q_est.q4,
-                    imuArg->eulers[0],imuArg->eulers[1],imuArg->eulers[2]);
+                    imuArg->eulers[0],imuArg->eulers[1],imuArg->eulers[2]); */
+            snprintf(imuStr,IMUSTR_MAX_LEN,
+                     "$2%.4f,%.4f,%.4f,%.4f\n",
+                     q_est.q1,q_est.q2,q_est.q3,q_est.q4);
             cmdIDLocal = *imuArg->cmdID;
             pthread_mutex_unlock(&mtx);
 
