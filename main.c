@@ -98,6 +98,7 @@ typedef struct canReaderArgs{
     float*    accel;
     float*    gyro;
     float*    eulers;
+    float*    quater;
 } canReaderArgs_t;
 
 typedef struct imuDataOutArgs{
@@ -108,6 +109,7 @@ typedef struct imuDataOutArgs{
     float*    accel;
     float*    gyro;
     float*    eulers;
+    float*    quater;
 } imuDataOutArgs_t;
 
 typedef struct spb2Data{
@@ -261,6 +263,7 @@ void* canReaderThread(void *arg){
     int16_t  gyro[3]   = {0,0,0};
     float    gyroF[3]  = {0.0,0.0,0.0};
     float    eulers[3] = {0.0,0.0,0.0};
+    float    quater[3] = {0.0,0.0,0.0};
 
     while(1){
         nBytes = read(canArg->canSocket, &frame, sizeof(struct can_frame));
@@ -304,9 +307,12 @@ void* canReaderThread(void *arg){
             }
 
             pthread_mutex_lock(&mtx);
-            imu_filter(accelF[0], accelF[1], accelF[2], gyroF[0], gyroF[1], gyroF[2]);
+            updateFilter(accelF[0], accelF[1], accelF[2],
+                         gyroF[0], gyroF[1], gyroF[2],
+                         &quater[0], &quater[1], &quater[2]);
 
-            eulerAngles(q_est, &eulers[0], &eulers[1], &eulers[2]);
+            eulerAngles(quater[0], quater[1], quater[2], 
+                        &eulers[0], &eulers[1], &eulers[2]);
 
             *canArg->imuTimestamp = timestamp;
             memcpy(canArg->rawAccel,accel,sizeof(accel));
@@ -314,6 +320,7 @@ void* canReaderThread(void *arg){
             memcpy(canArg->accel,accelN,sizeof(accelN));
             memcpy(canArg->gyro,gyroF,sizeof(gyroF));
             memcpy(canArg->eulers,eulers,sizeof(eulers));
+            memcpy(canArg->quater,quater,sizeof(quater));
             pthread_mutex_unlock(&mtx);
         }
     }
@@ -378,7 +385,7 @@ void* imuDataOutThread(void* arg){
                     imuArg->gyro[0],imuArg->gyro[1],imuArg->gyro[2],
                     imuArg->rawGyro[0],imuArg->rawGyro[1],imuArg->rawGyro[2],
                     imuArg->eulers[0],imuArg->eulers[1],imuArg->eulers[2],
-                    q_est.q1,q_est.q2,q_est.q3,q_est.q4);
+                    imuArg->quater[0],imuArg->quater[1],imuArg->quater[2],);
 
             cmdIDLocal = *imuArg->cmdID;
             pthread_mutex_unlock(&mtx);
@@ -438,6 +445,7 @@ int main(int argc, char *argv[]){
     float   accel[3]    = {0.0,0.0,0.0};
     float   gyro[3]     = {0.0,0.0,0.0};
     float   eulers[3]   = {0.0,0.0,0.0};
+    float   quater[3]   = {0.0,0.0,0.0};
 
     int devmem = open("/dev/mem", O_RDWR | O_SYNC);
     if (devmem < 0)
@@ -557,6 +565,7 @@ int main(int argc, char *argv[]){
     canReaderArgs.accel        = accel;
     canReaderArgs.gyro         = gyro;
     canReaderArgs.eulers       = eulers;
+    canReaderArgs.quater       = quater;
 
     imuDataOutArgs.cmdID        = &cmdID;
     imuDataOutArgs.imuTimestamp = &imuTimestamp;
@@ -565,6 +574,7 @@ int main(int argc, char *argv[]){
     imuDataOutArgs.accel        = accel;
     imuDataOutArgs.gyro         = gyro;
     imuDataOutArgs.eulers       = eulers;
+    imuDataOutArgs.quater       = quater;
 
     if(canSocket >= 0){
         err = pthread_create(&canRdrID, NULL, &canReaderThread, (void*)&canReaderArgs);
