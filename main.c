@@ -383,7 +383,7 @@ void* imuDataOutThread(void* arg){
 
             getpeername(imuConnFd,(struct sockaddr*)NULL, NULL);
 
-            exitCondition = (errno != 0) || (cmdIDLocal == EXIT);
+            exitCondition = (errno == ENOTCONN) || (cmdIDLocal == EXIT);
 
             if(exitCondition != 0)
                 break;
