@@ -338,10 +338,10 @@ void* imuDataOutThread(void* arg){
             pthread_mutex_lock(&mtx);
              snprintf(imuStr,IMUSTR_MAX_LEN,
                     "$%c\tT = %08x\n"
-                    "\t\taxR = %d, ayR = %d, azR = %d\n"
+                    "\t\taxR = %.3f, ayR = %.3f, azR = %.3f\n"
                     "\t\taxN = %.4f, ayN = %.4f, azN = %.4f\n"
                     "\t\tgx = %.4f, gy = %.4f, gz = %.4f\n"
-                    "\t\tgxR = %d, gyR = %d, gzR = %d\n"
+                    "\t\tgxR = %.3f, gyR = %.3f, gzR = %.3f\n"
                     "\t\troll = %.3f, pitch = %.3f, yaw = %.3f\n"
                     "Q%f,%f,%f,%f\n",
                     2,
