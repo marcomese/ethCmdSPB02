@@ -379,7 +379,7 @@ void* imuDataOutThread(void* arg){
                     q_est.q1,q_est.q2,q_est.q3,q_est.q4,
                     imuArg->eulers[0],imuArg->eulers[1],imuArg->eulers[2]); */
             snprintf(imuStr,IMUSTR_MAX_LEN,
-                     "$2%.4f,%.4f,%.4f,%.4f\n",
+                     "$%c%.4f,%.4f,%.4f,%.4f\n",2,
                      q_est.q1,q_est.q2,q_est.q3,q_est.q4);
             cmdIDLocal = *imuArg->cmdID;
             pthread_mutex_unlock(&mtx);
