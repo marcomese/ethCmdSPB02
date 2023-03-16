@@ -319,7 +319,6 @@ void* canReaderThread(void *arg){
             memcpy(canArg->accel,accelN,sizeof(accelN));
             memcpy(canArg->gyro,gyroF,sizeof(gyroF));
             memcpy(canArg->eulers,eulers,sizeof(eulers));
-            memcpy(canArg->quater,quater,sizeof(quater));
             pthread_mutex_unlock(&mtx);
         }
     }
