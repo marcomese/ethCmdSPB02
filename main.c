@@ -206,7 +206,7 @@ void* checkFifoThread(void *arg){
             data.unixTime  = (uint32_t)time(NULL);
             data.trgCount  = *(chkArg->fifoData+TRGCNT_IDX);
             data.gtuCount  = *(chkArg->fifoData+GTUCNT_IDX);
-            data.trgFlag   = *(chkArg->fifoData+TRGFLG_IDX) | (imuTimestamp << 8);
+            data.trgFlag   = *(chkArg->fifoData+TRGFLG_IDX);
             data.aliveTime = *(chkArg->fifoData+ALIVET_IDX);
             data.deadTime  = *(chkArg->fifoData+DEADT_IDX);
             data.status    = statusReg;
@@ -217,6 +217,10 @@ void* checkFifoThread(void *arg){
                 data.gpsStr[(((i-DATA_NUMERICS)*4)+2)] = (char)((*(chkArg->fifoData+i) & 0x00FF0000) >> 16);
                 data.gpsStr[(((i-DATA_NUMERICS)*4)+3)] = (char)((*(chkArg->fifoData+i) & 0xFF000000) >> 24);
             }
+
+            data.gpsStr[DATA_GPS_BYTES-3] = (imuTimestamp & 0xFF0000) >> 16;
+            data.gpsStr[DATA_GPS_BYTES-2] = (imuTimestamp & 0x00FF00) >> 8;
+            data.gpsStr[DATA_GPS_BYTES-1] = (imuTimestamp & 0x0000FF);
 
             pthread_mutex_unlock(&mtx);
 
