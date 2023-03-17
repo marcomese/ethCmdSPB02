@@ -218,9 +218,9 @@ void* checkFifoThread(void *arg){
                 data.gpsStr[(((i-DATA_NUMERICS)*4)+3)] = (char)((*(chkArg->fifoData+i) & 0xFF000000) >> 24);
             }
 
-            data.gpsStr[DATA_GPS_BYTES-3] = (imuTimestamp & 0xFF0000) >> 16;
-            data.gpsStr[DATA_GPS_BYTES-2] = (imuTimestamp & 0x00FF00) >> 8;
-            data.gpsStr[DATA_GPS_BYTES-1] = (imuTimestamp & 0x0000FF);
+            data.gpsStr[DATA_GPS_BYTES-3] = (char)((imuTimestamp & 0x0000FF));
+            data.gpsStr[DATA_GPS_BYTES-2] = (char)((imuTimestamp & 0x00FF00) >> 8);
+            data.gpsStr[DATA_GPS_BYTES-1] = (char)((imuTimestamp & 0xFF0000) >> 16);
 
             pthread_mutex_unlock(&mtx);
 
