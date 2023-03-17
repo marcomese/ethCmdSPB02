@@ -288,6 +288,8 @@ void* canReaderThread(void *arg){
             i++;
 
             if(i == 10){
+                i = 0;
+                
                 pthread_mutex_lock(&mtx);
 
                 imu_set_accelerometer_raw(canArg->imu, accel[0], accel[1], accel[2]);
