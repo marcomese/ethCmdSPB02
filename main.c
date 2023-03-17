@@ -249,6 +249,7 @@ void* canReaderThread(void *arg){
     uint32_t timestamp = 0;
     int16_t  accel[3]  = {0,0,0};
     int16_t  gyro[3]   = {0,0,0};
+    uint8_t i = 0;
 
     while(1){
         nBytes = read(canArg->canSocket, &frame, sizeof(struct can_frame));
@@ -283,7 +284,11 @@ void* canReaderThread(void *arg){
                 break;
         }
 
-        if(dataIdx == CAN_GZ_ID){
+        i++;
+
+        if(dataIdx == CAN_GZ_ID && i == 10){
+            i = 0;
+            
             pthread_mutex_lock(&mtx);
 
 			imu_set_accelerometer_raw(canArg->imu, accel[0], accel[1], accel[2]);
