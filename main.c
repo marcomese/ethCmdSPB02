@@ -60,7 +60,7 @@
 #define CAN_GZ_ID 25
 
 #define ACCEL_SCALE 2.0/32767.0
-#define GYRO_SCALE 125.0/32767.0
+#define GYRO_SCALE 250.0/32767.0
 
 #define GYRO_X_OFFSET 61.98
 #define GYRO_Y_OFFSET 27.80
