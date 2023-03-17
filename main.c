@@ -284,19 +284,19 @@ void* canReaderThread(void *arg){
                 break;
         }
 
-        i++;
+        if(dataIdx == CAN_GZ_ID){
+            i++;
 
-        if(dataIdx == CAN_GZ_ID && i == 10){
-            i = 0;
-            
-            pthread_mutex_lock(&mtx);
+            if(i == 10){
+                pthread_mutex_lock(&mtx);
 
-			imu_set_accelerometer_raw(canArg->imu, accel[0], accel[1], accel[2]);
-			imu_set_gyro_raw(canArg->imu, gyro[0], gyro[1], gyro[2]);
-			imu_main_loop(canArg->imu);
+                imu_set_accelerometer_raw(canArg->imu, accel[0], accel[1], accel[2]);
+                imu_set_gyro_raw(canArg->imu, gyro[0], gyro[1], gyro[2]);
+                imu_main_loop(canArg->imu);
 
-            *canArg->imuTimestamp = timestamp;
-            pthread_mutex_unlock(&mtx);
+                *canArg->imuTimestamp = timestamp;
+                pthread_mutex_unlock(&mtx);
+            }
         }
     }
 
