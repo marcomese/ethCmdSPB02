@@ -301,7 +301,7 @@ void* canReaderThread(void *arg){
                 quat[dataIdx-CAN_Q0_ID] = (float)(frame.data[1]      |
                                                   frame.data[2] << 8 |
                                                   frame.data[3] << 16|
-                                                  frame.data[4] << 24);
+                                                  frame.data[4] << 24)/1000.0;
                 break;
             case CAN_ROLL_ID:
             case CAN_PITCH_ID:
@@ -309,7 +309,7 @@ void* canReaderThread(void *arg){
                 eulers[dataIdx-CAN_ROLL_ID] = (float)(frame.data[1]      |
                                                       frame.data[2] << 8 |
                                                       frame.data[3] << 16|
-                                                      frame.data[4] << 24);
+                                                      frame.data[4] << 24)/1000.0;
                 break;
         }
 
