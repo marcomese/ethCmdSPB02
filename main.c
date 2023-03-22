@@ -58,13 +58,13 @@
 #define CAN_GX_ID        23
 #define CAN_GY_ID        24
 #define CAN_GZ_ID        25
-#define CAN_Q0_ID        26
-#define CAN_Q1_ID        27
-#define CAN_Q2_ID        28
-#define CAN_Q3_ID        29
-#define CAN_ROLL_ID      30
-#define CAN_PITCH_ID     31
-#define CAN_YAW_ID       32
+#define CAN_Q0_ID        32
+#define CAN_Q1_ID        33
+#define CAN_Q2_ID        34
+#define CAN_Q3_ID        35
+#define CAN_ROLL_ID      36
+#define CAN_PITCH_ID     37
+#define CAN_YAW_ID       38
 
 #define ACCEL_SCALE 2.0/32767.0
 #define GYRO_SCALE  250.0/32767.0
