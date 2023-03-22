@@ -52,15 +52,22 @@
 #define RUN_STATUS_MASK 0x01
 
 #define CAN_TIMESTAMP_ID 19
-#define CAN_AX_ID 20
-#define CAN_AY_ID 21
-#define CAN_AZ_ID 22
-#define CAN_GX_ID 23
-#define CAN_GY_ID 24
-#define CAN_GZ_ID 25
+#define CAN_AX_ID        20
+#define CAN_AY_ID        21
+#define CAN_AZ_ID        22
+#define CAN_GX_ID        23
+#define CAN_GY_ID        24
+#define CAN_GZ_ID        25
+#define CAN_Q0_ID        26
+#define CAN_Q1_ID        27
+#define CAN_Q2_ID        28
+#define CAN_Q3_ID        29
+#define CAN_ROLL_ID      30
+#define CAN_PITCH_ID     31
+#define CAN_YAW_ID       32
 
 #define ACCEL_SCALE 2.0/32767.0
-#define GYRO_SCALE 250.0/32767.0
+#define GYRO_SCALE  250.0/32767.0
 
 #define GYRO_X_OFFSET 61.98
 #define GYRO_Y_OFFSET 27.80
@@ -90,12 +97,16 @@ typedef struct canReaderArgs{
     int       canSocket;
     uint32_t* imuTimestamp;
     imu_t*    imu;
+    float*    quat;
+    float*    eulers;
 } canReaderArgs_t;
 
 typedef struct imuDataOutArgs{
     uint32_t* cmdID;
     uint32_t* imuTimestamp;
     imu_t*    imu;
+    float*    quat;
+    float*    eulers;
 } imuDataOutArgs_t;
 
 typedef struct spb2Data{
@@ -244,11 +255,13 @@ void* canReaderThread(void *arg){
     struct can_frame frame;
     unsigned int exitCondition = 0;
     uint32_t cmdIDLocal = 0;
-    int      nBytes    = 0;
-    uint8_t  dataIdx   = 0;
-    uint32_t timestamp = 0;
-    int16_t  accel[3]  = {0,0,0};
-    int16_t  gyro[3]   = {0,0,0};
+    int      nBytes     = 0;
+    uint8_t  dataIdx    = 0;
+    uint32_t timestamp  = 0;
+    int16_t  accel[3]   = {0,0,0};
+    int16_t  gyro[3]    = {0,0,0};
+    float    quat[4]    = {0.0,0.0,0.0,0.0};
+    float    eulers[3]  = {0.0,0.0,0.0};
 
     while(1){
         nBytes = read(canArg->canSocket, &frame, sizeof(struct can_frame));
@@ -281,10 +294,30 @@ void* canReaderThread(void *arg){
             case CAN_GZ_ID:
                 gyro[dataIdx-CAN_GX_ID] = frame.data[1] | frame.data[2] << 8;
                 break;
+            case CAN_Q0_ID:
+            case CAN_Q1_ID:
+            case CAN_Q2_ID:
+            case CAN_Q3_ID:
+                quat[dataIdx-CAN_Q0_ID] = (float)(frame.data[1]      |
+                                                  frame.data[2] << 8 |
+                                                  frame.data[3] << 16|
+                                                  frame.data[4] << 24);
+                break;
+            case CAN_ROLL_ID:
+            case CAN_PITCH_ID:
+            case CAN_YAW_ID:
+                eulers[dataIdx-CAN_ROLL_ID] = (float)(frame.data[1]      |
+                                                      frame.data[2] << 8 |
+                                                      frame.data[3] << 16|
+                                                      frame.data[4] << 24);
+                break;
         }
 
-        if(dataIdx == CAN_GZ_ID){
+        if(dataIdx == CAN_YAW_ID){
             pthread_mutex_lock(&mtx);
+
+            memcpy(canArg->quat, quat, sizeof(quat));
+            memcpy(canArg->eulers, eulers, sizeof(eulers));
 
             imu_set_accelerometer_raw(canArg->imu, accel[0], accel[1], accel[2]);
             imu_set_gyro_raw(canArg->imu, gyro[0], gyro[1], gyro[2]);
@@ -310,6 +343,8 @@ void* imuDataOutThread(void* arg){
     struct sockaddr_in imu_addr;
     char imuStr[IMUSTR_MAX_LEN] = "";
     char oldImuStr[IMUSTR_MAX_LEN] = "";
+    float    quat[4]    = {0.0,0.0,0.0,0.0};
+    float    eulers[3]  = {0.0,0.0,0.0};
 
     imuSockFd = socket(AF_INET, SOCK_STREAM, 0);
     memset(&imu_addr, '0', sizeof(imu_addr));
@@ -354,8 +389,10 @@ void* imuDataOutThread(void* arg){
                     imuArg->imu->gyro_raw.x, imuArg->imu->gyro_raw.y, imuArg->imu->gyro_raw.z,
                     imuArg->imu->accelerometer.x, imuArg->imu->accelerometer.y, imuArg->imu->accelerometer.z,
                     imuArg->imu->gyro.x, imuArg->imu->gyro.y, imuArg->imu->gyro.z,
-                    imuArg->imu->orientation.roll*180.0/PI, imuArg->imu->orientation.pitch*180.0/PI, imuArg->imu->orientation.yaw*180.0/PI,
-                    imuArg->imu->orientation_quat.w, imuArg->imu->orientation_quat.x, imuArg->imu->orientation_quat.y, imuArg->imu->orientation_quat.z);
+                    imuArg->eulers[0]*180.0/PI, imuArg->eulers[1]*180.0/PI, imuArg->eulers[2]*180.0/PI,
+                    imuArg->quat[0], imuArg->quat[1], imuArg->quat[2], imuArg->quat[3]);
+/*                     imuArg->imu->orientation.roll*180.0/PI, imuArg->imu->orientation.pitch*180.0/PI, imuArg->imu->orientation.yaw*180.0/PI,
+                    imuArg->imu->orientation_quat.w, imuArg->imu->orientation_quat.x, imuArg->imu->orientation_quat.y, imuArg->imu->orientation_quat.z); */
 
             cmdIDLocal = *imuArg->cmdID;
             pthread_mutex_unlock(&mtx);
@@ -411,6 +448,8 @@ int main(int argc, char *argv[]){
     struct sockaddr_can canAddr;
     struct can_filter rfilter;
     uint32_t imuTimestamp = 0;
+    float quat[4] = {0.0,0.0,0.0,0.0};
+    float eulers[3] = {0.0,0.0,0.0};
 
     int devmem = open("/dev/mem", O_RDWR | O_SYNC);
     if (devmem < 0)
@@ -534,10 +573,14 @@ int main(int argc, char *argv[]){
     canReaderArgs.canSocket    = canSocket;
     canReaderArgs.imuTimestamp = &imuTimestamp;
     canReaderArgs.imu          = &imu;
+    canReaderArgs.quat         = quat;
+    canReaderArgs.eulers       = eulers;
 
     imuDataOutArgs.cmdID        = &cmdID;
     imuDataOutArgs.imuTimestamp = &imuTimestamp;
     imuDataOutArgs.imu          = &imu;
+    imuDataOutArgs.quat         = quat;
+    imuDataOutArgs.eulers       = eulers;
 
     if(canSocket >= 0){
         err = pthread_create(&canRdrID, NULL, &canReaderThread, (void*)&canReaderArgs);
