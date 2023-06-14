@@ -592,9 +592,6 @@ int main(int argc, char *argv[]){
     if(err != 0)
         fprintf(stderr,"\tERR: Cannot create imuDataOut thread...: [%s]\n", strerror(err));
 
-    monitorArg.regs = &axiRegs;
-    monitorArg.cmdID = &cmdID;
-
     while (1)
     {
         cmdID = NONE;
@@ -629,16 +626,8 @@ int main(int argc, char *argv[]){
             continue;
         }
 
-        err = pthread_create(&monitorID, NULL, &monitorThread, (void*)&monitorArg);
-                if(err != 0){
-                    printf("\tERR: Cannot create checkFifo thread, disconnecting...: [%s]\n", strerror(err));
-                    close(connfd);
-                    continue;
-                }
-
         pthread_join(cmdDecID, (void**)&cmdDecRetVal);
         pthread_join(chkSttID, (void**)&chkSttRetVal);
-        pthread_join(monitorID, (void**)&monitorRetVal);
         pthread_mutex_destroy(&mtx);
 
         close(connfd);
